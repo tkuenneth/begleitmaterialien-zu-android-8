@@ -25,15 +25,15 @@ public class FileDemo1Activity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         // das Eingabefeld
-        final EditText edit = (EditText) findViewById(R.id.edit);
+        final EditText edit = findViewById(R.id.edit);
         // Leeren
-        final Button bClear = (Button) findViewById(R.id.clear);
+        final Button bClear = findViewById(R.id.clear);
         bClear.setOnClickListener((e) -> edit.setText(""));
         // Laden
-        final Button bLoad = (Button) findViewById(R.id.load);
+        final Button bLoad = findViewById(R.id.load);
         bLoad.setOnClickListener((e) -> edit.setText(load()));
         // Speichern
-        final Button bSave = (Button) findViewById(R.id.save);
+        final Button bSave = findViewById(R.id.save);
         bSave.setOnClickListener((e) -> save(edit.getText().toString()));
         // Ablageort der Dateien ermitteln und ausgeben
         File f = getFilesDir();
