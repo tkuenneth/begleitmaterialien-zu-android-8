@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Leeres Projekt</string>
+
+    <!-- wird in Kapitel 5 verwendet -->
+    <string name="hello">Hallo!</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Abbruch</string>
+    <string name="hint">Bitte Text eingeben</string>
+
+</resources>

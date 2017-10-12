@@ -22,7 +22,7 @@ public class ListenerDemo extends Activity {
         status.setOnClickListener(v
                 -> checkbox.setChecked(!checkbox.isChecked()));
 
-        checkbox.setOnCheckedChangeListener((buttonView, isChecked)
-                -> textview.setText(Boolean.toString(checkbox.isChecked())));
+//        checkbox.setOnCheckedChangeListener((buttonView, isChecked)
+//                -> textview.setText(Boolean.toString(checkbox.isChecked())));
     }
 }
