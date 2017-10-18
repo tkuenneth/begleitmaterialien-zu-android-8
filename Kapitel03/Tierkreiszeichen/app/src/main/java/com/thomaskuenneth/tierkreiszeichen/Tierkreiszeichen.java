@@ -77,7 +77,7 @@ final class Tierkreiszeichen {
             case R.string.virgo:
                 return R.drawable.virgo;
             default:
-                return R.drawable.icon;
+                return R.drawable.ic_launcher;
         }
     }
 }
