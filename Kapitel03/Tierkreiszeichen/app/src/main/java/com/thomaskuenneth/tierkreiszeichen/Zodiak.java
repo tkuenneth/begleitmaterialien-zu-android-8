@@ -1,8 +1,9 @@
 package com.thomaskuenneth.tierkreiszeichen;
 
+import android.util.SparseArray;
+
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Diese Klasse bildet die 12 Tierkreiszeichen
@@ -14,43 +15,43 @@ import java.util.Map;
  *
  * @author Thomas Künneth
  */
-public final class Zodiak {
+final class Zodiak {
 
     private static final Zodiak INSTANCE = new Zodiak();
 
-    private final Map<Integer, Tierkreiszeichen> map;
+    private final SparseArray<Tierkreiszeichen> a;
 
     private Zodiak() {
-        map = new HashMap<>();
-        map.put(Calendar.JANUARY,
+        a = new SparseArray<>();
+        a.put(Calendar.JANUARY,
                 new Tierkreiszeichen(21, Calendar.JANUARY,
                         R.string.aquarius));
-        map.put(Calendar.FEBRUARY,
+        a.put(Calendar.FEBRUARY,
                 new Tierkreiszeichen(20, Calendar.FEBRUARY,
                         R.string.pisces));
-        map.put(Calendar.MARCH, new Tierkreiszeichen(21, Calendar.MARCH,
+        a.put(Calendar.MARCH, new Tierkreiszeichen(21, Calendar.MARCH,
                 R.string.aries));
-        map.put(Calendar.APRIL, new Tierkreiszeichen(21, Calendar.APRIL,
+        a.put(Calendar.APRIL, new Tierkreiszeichen(21, Calendar.APRIL,
                 R.string.taurus));
-        map.put(Calendar.MAY, new Tierkreiszeichen(22, Calendar.MAY,
+        a.put(Calendar.MAY, new Tierkreiszeichen(22, Calendar.MAY,
                 R.string.gemini));
-        map.put(Calendar.JUNE, new Tierkreiszeichen(22, Calendar.JUNE,
+        a.put(Calendar.JUNE, new Tierkreiszeichen(22, Calendar.JUNE,
                 R.string.cancer));
-        map.put(Calendar.JULY,
+        a.put(Calendar.JULY,
                 new Tierkreiszeichen(24, Calendar.JULY,
                         R.string.leo));
-        map.put(Calendar.AUGUST,
+        a.put(Calendar.AUGUST,
                 new Tierkreiszeichen(24, Calendar.AUGUST,
                         R.string.virgo));
-        map.put(Calendar.SEPTEMBER, new Tierkreiszeichen(24,
+        a.put(Calendar.SEPTEMBER, new Tierkreiszeichen(24,
                 Calendar.SEPTEMBER, R.string.libra));
-        map.put(Calendar.OCTOBER,
+        a.put(Calendar.OCTOBER,
                 new Tierkreiszeichen(24, Calendar.OCTOBER,
                         R.string.scorpius));
-        map.put(Calendar.NOVEMBER,
+        a.put(Calendar.NOVEMBER,
                 new Tierkreiszeichen(23, Calendar.NOVEMBER,
                         R.string.sagittarius));
-        map.put(Calendar.DECEMBER,
+        a.put(Calendar.DECEMBER,
                 new Tierkreiszeichen(22, Calendar.DECEMBER,
                         R.string.capricornus));
     }
@@ -63,8 +64,8 @@ public final class Zodiak {
      * @param monat Monat, zum Beispiel {@code Calendar.JUNE}
      * @return Instanz eines {@link Tierkreiszeichen}s
      */
-    public static Tierkreiszeichen getTierkreiszeichenFuerMonat(
+    static Tierkreiszeichen getTierkreiszeichenFuerMonat(
             int monat) {
-        return INSTANCE.map.get(monat);
+        return INSTANCE.a.get(monat);
     }
 }

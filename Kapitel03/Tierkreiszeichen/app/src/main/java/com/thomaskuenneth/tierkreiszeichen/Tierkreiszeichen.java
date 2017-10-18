@@ -18,32 +18,28 @@ import android.content.Context;
  * @author Thomas Künneth
  * @see Zodiak
  */
-public final class Tierkreiszeichen {
+final class Tierkreiszeichen {
 
     private final int tierkreiszeichen;
 
     // Wann ein Sternzeichen beginnt
     private final int tag, monat;
 
-    public Tierkreiszeichen(int tag, int monat, int tierkreiszeichen) {
+    Tierkreiszeichen(int tag, int monat, int tierkreiszeichen) {
         this.tag = tag;
         this.monat = monat;
         this.tierkreiszeichen = tierkreiszeichen;
     }
 
-    public int getTag() {
+    int getTag() {
         return tag;
     }
 
-    public int getMonat() {
+    int getMonat() {
         return monat;
     }
 
-    public int getTierkreiszeichen() {
-        return tierkreiszeichen;
-    }
-
-    public String getName(Context context) {
+    String getName(Context context) {
         return context.getString(tierkreiszeichen);
     }
 
@@ -54,7 +50,7 @@ public final class Tierkreiszeichen {
      *
      * @return Wert aus {@code R.drawable}
      */
-    public int getIdForDrawable() {
+    int getIdForDrawable() {
         switch (tierkreiszeichen) {
             case R.string.aquarius:
                 return R.drawable.aquarius;

@@ -21,14 +21,14 @@ import java.util.Locale;
  * @author Thomas Künneth
  * @see BaseAdapter
  */
-public class TierkreiszeichenAdapter extends BaseAdapter {
+class TierkreiszeichenAdapter extends BaseAdapter {
 
     private final List<Tierkreiszeichen> zodiak;
     private final LayoutInflater inflator;
     private final DateFormat df;
     private final Calendar cal;
 
-    public TierkreiszeichenAdapter(Context context) {
+    TierkreiszeichenAdapter(Context context) {
         // wird für das Aufblasen der XML-Datei benötigt
         inflator = LayoutInflater.from(context);
         // Tierkreiszeichen für alle Monate ermitteln
@@ -72,13 +72,10 @@ public class TierkreiszeichenAdapter extends BaseAdapter {
                     parent, false);
             // Holder erzeugen
             holder = new ViewHolder();
-            holder.name =
-                    (TextView) convertView.findViewById(R.id.text1);
-            holder.datumsbereich = (TextView) convertView
+            holder.name = convertView.findViewById(R.id.text1);
+            holder.datumsbereich = convertView
                     .findViewById(R.id.text2);
-            holder.icon =
-                    (ImageView) convertView.findViewById(R.id.icon);
-
+            holder.icon = convertView.findViewById(R.id.icon);
             convertView.setTag(holder);
         } else {
             // Holder bereits vorhanden
