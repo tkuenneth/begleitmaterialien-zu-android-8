@@ -3,9 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/ContextMenuDemo.iml" filepath="$PROJECT_DIR$/ContextMenuDemo.iml" />
-      <module fileurl="file://C:\Users\tkuen\Entwicklung\Bitbucket\begleit8\Kapitel05\ContextMenuDemo\ContextMenuDemo.iml" filepath="C:\Users\tkuen\Entwicklung\Bitbucket\begleit8\Kapitel05\ContextMenuDemo\ContextMenuDemo.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://C:\Users\tkuen\Entwicklung\Bitbucket\begleit8\Kapitel05\ContextMenuDemo\app\app.iml" filepath="C:\Users\tkuen\Entwicklung\Bitbucket\begleit8\Kapitel05\ContextMenuDemo\app\app.iml" />
     </modules>
   </component>
 </project>
