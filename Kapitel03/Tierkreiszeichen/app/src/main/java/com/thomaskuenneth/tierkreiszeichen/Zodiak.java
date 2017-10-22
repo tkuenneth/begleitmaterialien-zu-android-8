@@ -3,12 +3,11 @@ package com.thomaskuenneth.tierkreiszeichen;
 import android.util.SparseArray;
 
 import java.util.Calendar;
-import java.util.HashMap;
 
 /**
- * Diese Klasse bildet die 12 Tierkreiszeichen
- * in eine {@link HashMap} ab,
- * deren Schlüssel der Monat ist. Die Datumsangaben
+ * Diese Klasse legt die 12 Tierkreiszeichen
+ * in einm {@link SparseArray} ab,
+ * dessen Schlüssel der Monat ist. Die Datumsangaben
  * stellen Mittelwerte dar und beziehen sich auf ein
  * Jahr mit 365 Tagen. Schaltjahre sind in den Datierungen
  * der Tierkreiszeichen also nicht berücksichtigt.
@@ -57,8 +56,8 @@ final class Zodiak {
     }
 
     /**
-     * Liefert eine Referenz auf ein Element der
-     * Hashtable, die das Sternzeichen des übergebenen
+     * Liefert eine Referenz auf ein Element des
+     * SparseArrays, das das Sternzeichen des übergebenen
      * Monats repräsentiert.
      *
      * @param monat Monat, zum Beispiel {@code Calendar.JUNE}

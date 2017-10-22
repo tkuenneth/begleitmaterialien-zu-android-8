@@ -24,13 +24,13 @@ import java.util.Locale;
 class TierkreiszeichenAdapter extends BaseAdapter {
 
     private final List<Tierkreiszeichen> zodiak;
-    private final LayoutInflater inflator;
+    private final LayoutInflater inflater;
     private final DateFormat df;
     private final Calendar cal;
 
     TierkreiszeichenAdapter(Context context) {
         // wird für das Aufblasen der XML-Datei benötigt
-        inflator = LayoutInflater.from(context);
+        inflater = LayoutInflater.from(context);
         // Tierkreiszeichen für alle Monate ermitteln
         zodiak = new ArrayList<>();
         for (int monat = Calendar.JANUARY;
@@ -68,7 +68,7 @@ class TierkreiszeichenAdapter extends BaseAdapter {
         // falls nötig, convertView bauen
         if (convertView == null) {
             // Layoutdatei entfalten
-            convertView = inflator.inflate(R.layout.icon_text_text,
+            convertView = inflater.inflate(R.layout.icon_text_text,
                     parent, false);
             // Holder erzeugen
             holder = new ViewHolder();
