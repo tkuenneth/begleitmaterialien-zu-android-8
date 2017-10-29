@@ -28,6 +28,12 @@ public class PermissionDemoActivity extends Activity {
         tv = findViewById(R.id.tv);
         bt = findViewById(R.id.bt);
         bt.setOnClickListener(view -> requestPermission());
+
+//        Intent intent = new Intent();
+//        intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+//        Uri uri = Uri.fromParts("package", getPackageName(), null);
+//        intent.setData(uri);
+//        startActivity(intent);
     }
 
     @Override

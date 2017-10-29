@@ -1,6 +1,7 @@
 package com.thomaskuenneth.broadcastreceiverdemo;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -29,9 +30,14 @@ public class BootCompletedReceiver extends BroadcastReceiver {
                     setContentText(msg).
                     setWhen(System.currentTimeMillis());
             Notification n = builder.build();
-            // anzeigen
             NotificationManager m = context.getSystemService(NotificationManager.class);
             if (m != null) {
+                // Kanal anlegen
+                NotificationChannel channel = new NotificationChannel(CHANNEL_ID,
+                        context.getString(R.string.app_name),
+                        NotificationManager.IMPORTANCE_DEFAULT);
+                m.createNotificationChannel(channel);
+                // anzeigen
                 m.notify(ID, n);
             }
         }

@@ -5,7 +5,7 @@
 
     <fragment
         android:id="@+id/auswahl"
-        class="com.thomaskuenneth.fragmentdemo3.FragmentDemo3Activity$AuswahlFragment"
+        class="com.thomaskuenneth.fragmentdemo3.AuswahlFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 

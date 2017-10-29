@@ -2,4 +2,5 @@
 <resources>
     <string name="app_name">BroadcastReceiverDemo</string>
     <string name="text">System wurde gestartet</string>
+    <string name="info">Sie können das Gerät jetzt neu starten</string>
 </resources>
