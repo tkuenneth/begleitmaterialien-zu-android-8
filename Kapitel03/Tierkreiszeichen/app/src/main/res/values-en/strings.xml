@@ -16,6 +16,7 @@
 	<string name="sagittarius">sagittarius</string> 
 	<string name="capricornus">capricornus</string> 
 	<string name="aquarius">aquarius</string> 
-	<string name="pisces">pisces</string> 
-    
+	<string name="pisces">pisces</string>
+    <string name="hint">An image</string>
+
 </resources>
