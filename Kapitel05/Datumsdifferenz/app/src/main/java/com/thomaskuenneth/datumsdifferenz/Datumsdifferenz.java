@@ -11,7 +11,6 @@ import java.util.Calendar;
 public class Datumsdifferenz extends Activity {
 
     private Calendar cal1, cal2;
-
     private TextView tv;
     private DatePicker dp1, dp2;
 
@@ -19,17 +18,13 @@ public class Datumsdifferenz extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-
         cal1 = Calendar.getInstance();
         cal2 = Calendar.getInstance();
-
         dp1 = findViewById(R.id.date1);
         dp2 = findViewById(R.id.date2);
         tv = findViewById(R.id.textview_result);
-
         final Button b = findViewById(R.id.button_calc);
         b.setOnClickListener(v -> berechnen());
-
         berechnen();
     }
 
@@ -52,7 +47,8 @@ public class Datumsdifferenz extends Activity {
         tv.setText(getString(R.string.template, days));
     }
 
-    private void updateCalendarFromDatePicker(Calendar cal, DatePicker dp) {
+    private void updateCalendarFromDatePicker(Calendar cal,
+                                              DatePicker dp) {
         cal.set(Calendar.YEAR, dp.getYear());
         cal.set(Calendar.MONTH, dp.getMonth());
         cal.set(Calendar.DAY_OF_MONTH, dp.getDayOfMonth());
