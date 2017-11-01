@@ -12,7 +12,6 @@ public class ZugriffAufRessourcenActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_zugriff_auf_ressourcen);
-
         final TextView textview = findViewById(R.id.textview);
         textview.append("getString(R.string.app_name): "
                 + getString(R.string.app_name));
@@ -24,7 +23,8 @@ public class ZugriffAufRessourcenActivity extends Activity {
         boolean b1 = getResources().getBoolean(R.bool.bool1);
         boolean b2 = getResources().getBoolean(R.bool.bool2);
         textview.append("\n\nb1=" + b1 + ", b2=" + b2);
-        textview.append("\n\nadams=" + getResources().getInteger(R.integer.adams));
+        textview.append("\n\nadams=" +
+                getResources().getInteger(R.integer.adams));
         textview.setTextColor(getResources().getColor(R.color.eine_farbe,
                 getTheme()));
     }
