@@ -1,15 +1,11 @@
 package com.thomaskuenneth.uithreaddemo;
 
-import android.os.Handler;
-import android.util.Log;
 import android.app.Activity;
 import android.os.Bundle;
-import android.view.View;
-import android.view.View.OnClickListener;
+import android.os.Handler;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.TextView;
 
 public class UIThreadDemo extends Activity {
@@ -24,97 +20,59 @@ public class UIThreadDemo extends Activity {
         final CheckBox checkbox = findViewById(R.id.checkbox);
         checkbox.setOnCheckedChangeListener((buttonView, isChecked) -> tv.setText(Boolean.toString(isChecked)));
         checkbox.setChecked(true);
-        final Button button = (Button) findViewById(R.id.button);
-        button.setOnClickListener(new OnClickListener() {
+        final Button button = findViewById(R.id.button);
 
+        button.setOnClickListener(v -> {
             // ursprüngliche Version
-            @Override
-            public void onClick(View v) {
+            tv.setText(UIThreadDemo.this.getString(R.string.begin));
+            if (checkbox.isChecked()) {
+                try {
+                    Thread.sleep(3500);
+                } catch (InterruptedException e) {
+                    Log.e(TAG, "sleep()", e);
+                }
+            } else {
+                while (true) ;
+            }
+            tv.setText(UIThreadDemo.this.getString(R.string.end));
+
+            // //fehlerhafteVersion
+            new Thread(() -> {
                 tv.setText(UIThreadDemo.this.getString(R.string.begin));
-                if (checkbox.isChecked()) {
-                    try {
-                        Thread.sleep(3500);
-                    } catch (InterruptedException e) {
-                        Log.e(TAG, "sleep()", e);
-                    }
-                } else {
-                    while (true) ;
+                try {
+                    Thread.sleep(10000);
+                } catch (InterruptedException e) {
+                    Log.e(TAG, "sleep()", e);
                 }
                 tv.setText(UIThreadDemo.this.getString(R.string.end));
-            }
-
-            // fehlerhafte Version
-//            @Override
-//            public void onClick(View v) {
-//                new Thread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        tv.setText(UIThreadDemo.this.getString(R.string.begin));
-//                        try {
-//                            Thread.sleep(10000);
-//                        } catch (InterruptedException e) {
-//                            Log.e(TAG, "sleep()", e);
-//                        }
-//                        tv.setText(UIThreadDemo.this.getString(R.string.end));
-//                    }
-//                }).start();
-//            }
+            }).start();
 
             // korrekte Version
-//            @Override
-//            public void onClick(View v) {
-//                final Handler h = new Handler();
-//                new Thread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        try {
-//                            h.post(new Runnable() {
-//                                @Override
-//                                public void run() {
-//                                    tv.setText(UIThreadDemo.this
-//                                            .getString(R.string.begin));
-//                                }
-//                            });
-//                            Thread.sleep(10000);
-//                            h.post(new Runnable() {
-//                                @Override
-//                                public void run() {
-//                                    tv.setText(UIThreadDemo.this
-//                                            .getString(R.string.end));
-//                                }
-//                            });
-//                        } catch (InterruptedException e) {
-//                            Log.e(TAG, "sleep()", e);
-//                        }
-//                    }
-//                }).start();
-//            }
+            final Handler h = new Handler();
+            new Thread(() -> {
+                try {
+                    h.post(() -> tv.setText(UIThreadDemo.this
+                            .getString(R.string.begin)));
+                    Thread.sleep(10000);
+                    h.post(() -> tv.setText(UIThreadDemo.this
+                            .getString(R.string.end)));
+                } catch (InterruptedException e) {
+                    Log.e(TAG, "sleep()", e);
+                }
+            }).start();
 
             // ebenfalls korrekte Version
-//            @Override
-//            public void onClick(View v) {
-//                Thread t = new Thread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        try {
-//                            Thread.sleep(10000);
-//                        } catch (InterruptedException e) {
-//                            Log.e(TAG, "sleep()", e);
-//                        }
-//                        runOnUiThread(new Runnable() {
-//
-//                            @Override
-//                            public void run() {
-//                                tv.setText(UIThreadDemo.this.getString(
-//                                        R.string.end));
-//                            }
-//                        });
-//                    }
-//                });
-//                tv.setText(UIThreadDemo.this.getString(R.string.begin));
-//                t.start();
-//            }
-
+            Thread t = new Thread(() -> {
+                try {
+                    Thread.sleep(10000);
+                } catch (InterruptedException e) {
+                    Log.e(TAG, "sleep()", e);
+                }
+                runOnUiThread(() -> tv.setText(UIThreadDemo.this.getString(
+                        R.string.end)));
+            });
+            tv.setText(UIThreadDemo.this.getString(R.string.begin));
+            t.start();
         });
     }
 }
