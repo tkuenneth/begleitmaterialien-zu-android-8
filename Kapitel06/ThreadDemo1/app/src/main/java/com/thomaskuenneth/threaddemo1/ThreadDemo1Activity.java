@@ -14,15 +14,8 @@ public class ThreadDemo1Activity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         Log.d(TAG, Thread.currentThread().getName());
-
-        Runnable r = new Runnable() {
-            @Override
-            public void run() {
-                Log.d(TAG, "run()-Methode wurde aufgerufen");
-            }
-        };
+        Runnable r = () -> Log.d(TAG, "run()-Methode wurde aufgerufen");
         Thread t = new Thread(r);
         t.start();
         Log.d(TAG, "Thread wurde gestartet");
@@ -49,6 +42,7 @@ public class ThreadDemo1Activity extends Activity {
         keepRunning = false;
     }
 
+
     private Runnable fibRunner() {
         return new Runnable() {
 
@@ -74,35 +68,28 @@ public class ThreadDemo1Activity extends Activity {
     }
 
     private Runnable bewegeGegner1() {
-        return new Runnable() {
-            @Override
-            public void run() {
-                while (true) {
-                    Log.i(TAG, "bewege Gegner 1");
-                    try {
-                        Thread.sleep(3000);
-                    } catch (InterruptedException e) {
-                        Log.e(TAG, "sleepTester()", e);
-                    }
+        return () -> {
+            while (true) {
+                Log.i(TAG, "bewege Gegner 1");
+                try {
+                    Thread.sleep(3000);
+                } catch (InterruptedException e) {
+                    Log.e(TAG, "sleepTester()", e);
                 }
             }
         };
     }
 
     private Runnable bewegeGegner2() {
-        return new Runnable() {
-            @Override
-            public void run() {
-                while (keepRunning) {
-                    Log.i(TAG, "bewege Gegner 2");
-                    try {
-                        Thread.sleep(3000);
-                    } catch (InterruptedException e) {
-                        Log.e(TAG, "sleepTester()", e);
-                    }
+        return () -> {
+            while (keepRunning) {
+                Log.i(TAG, "bewege Gegner 2");
+                try {
+                    Thread.sleep(3000);
+                } catch (InterruptedException e) {
+                    Log.e(TAG, "sleepTester()", e);
                 }
             }
         };
     }
-
 }
