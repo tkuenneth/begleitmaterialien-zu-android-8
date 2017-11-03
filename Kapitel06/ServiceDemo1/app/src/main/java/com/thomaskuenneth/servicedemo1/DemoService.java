@@ -25,12 +25,10 @@ public class DemoService extends Service {
     @Override
     public void onCreate() {
         Log.d(TAG, "onCreate()");
-        // ContentObserver registrieren
         contentObserver = new ContentObserver(new Handler()) {
 
             @Override
             public void onChange(boolean selfChange) {
-                // Zahl der verpassten Anrufe ausgeben
                 int missedCalls = getMissedCalls();
                 Log.d(TAG, missedCalls + " verpasste Anrufe");
             }

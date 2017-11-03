@@ -31,7 +31,7 @@ public class ServiceDemo1Activity extends Activity {
         if (requestCode == RQ_CALL_LOG) {
             if ((grantResults.length > 0)
                     && (grantResults[0] ==
-                    PackageManager.PERMISSION_GRANTED)){
+                    PackageManager.PERMISSION_GRANTED)) {
                 startServiceAndFinish();
             } else {
                 Toast.makeText(this, R.string.denied,

@@ -7,9 +7,6 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.view.KeyEvent;
-import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -20,7 +17,6 @@ public class ServiceDemo2Activity extends Activity {
 
     private LocalService mService = null;
 
-    // wird in onStart() und onStop() verwendet
     private ServiceConnection mConnection = new ServiceConnection() {
 
         @Override
@@ -40,35 +36,27 @@ public class ServiceDemo2Activity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-        final TextView textview = (TextView) findViewById(R.id.textview);
-        final EditText edittext = (EditText) findViewById(R.id.edittext);
-        final Button button = (Button) findViewById(R.id.button);
-        button.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mService != null) {
-                    try {
-                        int n =  Integer.parseInt(
-                                        edittext.getText().toString());
-                        // Service aufrufen und Fakultät berechnen lassen
-                        int fak = mService.fakultaet(n);
-                        textview.setText(getString(R.string.template,
-                                n, fak));
-                    } catch (NumberFormatException e) {
-                        textview.setText(R.string.info);
-                    }
+        final TextView textview = findViewById(R.id.textview);
+        final EditText edittext = findViewById(R.id.edittext);
+        final Button button = findViewById(R.id.button);
+        button.setOnClickListener(v -> {
+            if (mService != null) {
+                try {
+                    int n = Integer.parseInt(
+                            edittext.getText().toString());
+                    int fak = mService.fakultaet(n);
+                    textview.setText(getString(R.string.template,
+                            n, fak));
+                } catch (NumberFormatException e) {
+                    textview.setText(R.string.info);
                 }
             }
         });
         edittext.setOnEditorActionListener(
-                new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int i,
-                                          KeyEvent keyEvent) {
-                button.performClick();
-                return true;
-            }
-        });
+                (textView, i, keyEvent) -> {
+                    button.performClick();
+                    return true;
+                });
     }
 
     @Override
