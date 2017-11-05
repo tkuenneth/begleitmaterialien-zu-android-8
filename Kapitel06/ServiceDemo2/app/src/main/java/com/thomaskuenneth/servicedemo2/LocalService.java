@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
 
-class LocalService extends Service {
+public class LocalService extends Service {
 
     private final IBinder mBinder = new LocalBinder();
 

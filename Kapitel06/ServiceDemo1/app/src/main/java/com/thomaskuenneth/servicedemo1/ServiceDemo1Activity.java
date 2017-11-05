@@ -43,6 +43,7 @@ public class ServiceDemo1Activity extends Activity {
     private void startServiceAndFinish() {
         Intent intent = new Intent(this, DemoService.class);
         startService(intent);
+//        startForegroundService(intent);
         finish();
     }
 }

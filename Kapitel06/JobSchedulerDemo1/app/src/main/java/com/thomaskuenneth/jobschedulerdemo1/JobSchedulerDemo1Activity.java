@@ -8,6 +8,7 @@ import android.os.Bundle;
 
 import java.util.List;
 
+import android.widget.TextView;
 
 public class JobSchedulerDemo1Activity extends Activity {
 
@@ -17,6 +18,7 @@ public class JobSchedulerDemo1Activity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+        TextView tv = findViewById(R.id.textview);
         JobScheduler scheduler = getSystemService(JobScheduler.class);
         if (scheduler != null) {
             // ausstehende Jobs anzeigen
@@ -34,12 +36,13 @@ public class JobSchedulerDemo1Activity extends Activity {
                     JobSchedulerDemo1Service.class);
             JobInfo jobInfo = new JobInfo.Builder(JOB_ID, serviceEndpoint)
                     // alle 10 Sekunden wiederholen
-                    .setPeriodic(10000)
+                    .setPeriodic(20*60*1000)
                     // nur wenn das Ladekabel angeschlossen ist
                     .setRequiresCharging(true)
                     .build();
             // die Ausführung planen
             scheduler.schedule(jobInfo);
+            tv.setText(sb.toString());
         }
     }
 }

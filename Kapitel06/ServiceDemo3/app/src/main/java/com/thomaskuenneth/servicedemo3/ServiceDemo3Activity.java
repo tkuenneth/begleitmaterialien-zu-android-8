@@ -12,9 +12,6 @@ import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 import android.util.Log;
-import android.view.KeyEvent;
-import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -44,39 +41,32 @@ public class ServiceDemo3Activity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-        final TextView textview = (TextView) findViewById(R.id.textview);
-        final EditText edittext = (EditText) findViewById(R.id.edittext);
-        final Button button = (Button) findViewById(R.id.button);
+        final TextView textview = findViewById(R.id.textview);
+        final EditText edittext = findViewById(R.id.edittext);
+        final Button button = findViewById(R.id.button);
         final Messenger mMessenger =
                 new Messenger(new IncomingHandler(this, textview));
-        button.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mService != null) {
-                    try {
-                        int n = Integer.parseInt(
-                                edittext.getText().toString());
-                        Message msg = Message.obtain(null,
-                                MSG_FAKULTAET_IN,
-                                n, 0);
-                        msg.replyTo = mMessenger;
-                        mService.send(msg);
-                    } catch (NumberFormatException e) {
-                        textview.setText(R.string.info);
-                    } catch (RemoteException e) {
-                        Log.d(TAG, "send()", e);
-                    }
+        button.setOnClickListener(v -> {
+            if (mService != null) {
+                try {
+                    int n = Integer.parseInt(
+                            edittext.getText().toString());
+                    Message msg = Message.obtain(null,
+                            MSG_FAKULTAET_IN,
+                            n, 0);
+                    msg.replyTo = mMessenger;
+                    mService.send(msg);
+                } catch (NumberFormatException e) {
+                    textview.setText(R.string.info);
+                } catch (RemoteException e) {
+                    Log.d(TAG, "send()", e);
                 }
             }
         });
         edittext.setOnEditorActionListener(
-                new TextView.OnEditorActionListener() {
-                    @Override
-                    public boolean onEditorAction(TextView textView, int i,
-                                                  KeyEvent keyEvent) {
-                        button.performClick();
-                        return true;
-                    }
+                (textView, i, keyEvent) -> {
+                    button.performClick();
+                    return true;
                 });
     }
 
