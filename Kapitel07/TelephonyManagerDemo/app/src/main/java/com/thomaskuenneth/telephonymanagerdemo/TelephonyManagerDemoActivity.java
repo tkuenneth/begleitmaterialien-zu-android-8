@@ -7,11 +7,15 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 import android.widget.TextView;
 
 public class TelephonyManagerDemoActivity extends Activity {
 
-    private static final int MY_PERMISSIONS_REQUEST_READ_PHONE_STATE =
+    private static final String TAG =
+            TelephonyManagerDemoActivity.class.getSimpleName();
+
+    private static final int RQ_READ_PHONE_STATE =
             123;
 
     private TextView textview;
@@ -39,25 +43,22 @@ public class TelephonyManagerDemoActivity extends Activity {
                         Boolean.toString(mwi) + "\n");
             }
         };
-        textview.append("ANDROID_ID: " +
-                Settings.Secure.getString(getContentResolver(),
-                Settings.Secure.ANDROID_ID) + "\n");
         try {
             textview.append("SKIP_FIRST_USE_HINTS: " +
                     Settings.Secure.getInt(getContentResolver(),
-                    Settings.Secure.SKIP_FIRST_USE_HINTS) +
+                            Settings.Secure.SKIP_FIRST_USE_HINTS) +
                     "\n");
         } catch (Settings.SettingNotFoundException e) {
-            // Ausnahme ignorieren
+            Log.e(TAG, null, e);
         }
         mgr = getSystemService(TelephonyManager.class);
         if (checkSelfPermission(Manifest.permission.READ_PHONE_STATE)
                 != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(
                     new String[]{Manifest.permission.READ_PHONE_STATE},
-                    MY_PERMISSIONS_REQUEST_READ_PHONE_STATE);
+                    RQ_READ_PHONE_STATE);
         } else {
-            listenAndGetDeviceId();
+            listen();
         }
     }
 
@@ -65,10 +66,10 @@ public class TelephonyManagerDemoActivity extends Activity {
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[],
                                            int[] grantResults) {
-        if ((requestCode == MY_PERMISSIONS_REQUEST_READ_PHONE_STATE) &&
+        if ((requestCode == RQ_READ_PHONE_STATE) &&
                 (grantResults.length > 0 && grantResults[0] ==
                         PackageManager.PERMISSION_GRANTED)) {
-            listenAndGetDeviceId();
+            listen();
         }
     }
 
@@ -78,9 +79,8 @@ public class TelephonyManagerDemoActivity extends Activity {
         mgr.listen(psl, PhoneStateListener.LISTEN_NONE);
     }
 
-    private void listenAndGetDeviceId() {
+    private void listen() {
         mgr.listen(psl, PhoneStateListener.LISTEN_CALL_STATE |
                 PhoneStateListener.LISTEN_MESSAGE_WAITING_INDICATOR);
-        textview.append(mgr.getDeviceId() + "\n");
     }
 }
