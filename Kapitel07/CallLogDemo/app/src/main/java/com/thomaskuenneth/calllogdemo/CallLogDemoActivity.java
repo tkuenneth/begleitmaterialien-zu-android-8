@@ -53,26 +53,19 @@ public class CallLogDemoActivity extends ListActivity {
                         long callLogId = c.getLong(c.getColumnIndex(
                                 CallLog.Calls._ID));
                         updateCallLogData(callLogId);
-                        updateAdapter();
                     }
                 });
-        contentObserver = new ContentObserver(new Handler()) {
-            @Override
-            public void onChange(boolean selfChange) {
-                updateAdapter();
-            }
-        };
-        getContentResolver().registerContentObserver(
-                CallLog.Calls.CONTENT_URI,
-                false, contentObserver);
+        contentObserver = null;
         updateAdapter();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        getContentResolver().unregisterContentObserver(contentObserver);
-        contentObserver = null;
+        if (contentObserver != null) {
+            getContentResolver().unregisterContentObserver(contentObserver);
+            contentObserver = null;
+        }
     }
 
     @Override
@@ -100,6 +93,18 @@ public class CallLogDemoActivity extends ListActivity {
                     PERMISSIONS_REQUEST_READ_CALL_LOG);
         } else {
             final ContentResolver cr = getContentResolver();
+            if (contentObserver == null) {
+                contentObserver = new ContentObserver(new Handler()) {
+                    @Override
+                    public void onChange(boolean selfChange) {
+                        updateAdapter();
+                    }
+                };
+                cr.registerContentObserver(
+                        CallLog.Calls.CONTENT_URI,
+                        false, contentObserver);
+            }
+            cursorAdapter.changeCursor(null);
             Thread t = new Thread(() -> {
                 final Cursor c = getMissedCalls(cr);
                 runOnUiThread(() -> cursorAdapter.changeCursor(c));
