@@ -31,6 +31,7 @@ public class WebserviceDemo1Activity extends Activity {
     private static final Pattern PATTERN_CHARSET
             = Pattern.compile(".*charset\\s*=\\s*(.*)$");
     private static final String ID = "id";
+    private static final String RHEINWERK = "https://www.rheinwerk-verlag.de/";
 
     private TextView output;
 
@@ -39,6 +40,7 @@ public class WebserviceDemo1Activity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         final EditText input = findViewById(R.id.input);
+        input.setText(RHEINWERK);
         output = findViewById(R.id.output);
         final Button shorten = findViewById(R.id.shorten);
         shorten.setOnClickListener((v) -> {
