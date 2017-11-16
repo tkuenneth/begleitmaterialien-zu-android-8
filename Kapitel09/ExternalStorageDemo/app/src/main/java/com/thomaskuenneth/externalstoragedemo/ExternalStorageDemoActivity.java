@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
 import android.widget.TextView;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -33,11 +34,11 @@ public class ExternalStorageDemoActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-        tv = (TextView) findViewById(R.id.tv);
+        tv = findViewById(R.id.tv);
         if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]
-                    {Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                            {Manifest.permission.WRITE_EXTERNAL_STORAGE},
                     PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
         } else {
             doIt();

@@ -11,8 +11,10 @@ public class DruckDemo2Activity extends Activity {
         super.onCreate(savedInstanceState);
         PrintManager printManager =
                 getSystemService(PrintManager.class);
-        String jobName = getString(R.string.app_name) + " Document";
-        printManager.print(jobName,
-                new DemoPrintDocumentAdapter(this), null);
+        if (printManager != null) {
+            String jobName = getString(R.string.app_name) + " Document";
+            printManager.print(jobName,
+                    new DemoPrintDocumentAdapter(this), null);
+        }
     }
 }

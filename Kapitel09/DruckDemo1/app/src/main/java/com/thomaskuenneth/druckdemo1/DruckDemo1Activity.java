@@ -35,15 +35,20 @@ public class DruckDemo1Activity extends Activity {
                 // PrintManager-Instanz ermitteln
                 PrintManager printManager =
                         getSystemService(PrintManager.class);
-                // Der Adapter stellt den Dokumentinhalt bereit
-                PrintDocumentAdapter printAdapter =
-                        webView.createPrintDocumentAdapter("Dokumentname");
-                // Druckauftrag erstellen und übergeben
-                String jobName = getString(R.string.app_name) + " Dokument";
-                PrintJob printJob = printManager.print(jobName,
-                        printAdapter,
-                        new PrintAttributes.Builder().build());
-                Log.d(TAG, printJob.getInfo().toString());
+                if (printManager != null) {
+                    // Der Adapter stellt den Dokumentinhalt bereit
+                    PrintDocumentAdapter printAdapter =
+                            webView.createPrintDocumentAdapter("Dokumentname");
+                    // Druckauftrag erstellen und übergeben
+                    String jobName = getString(R.string.app_name) + " Dokument";
+                    PrintAttributes attributes = new PrintAttributes.Builder().build();
+                    if (printAdapter != null) {
+                        PrintJob printJob = printManager.print(jobName,
+                                printAdapter,
+                                attributes);
+                        Log.d(TAG, printJob.getInfo().toString());
+                    }
+                }
             }
         });
 

@@ -21,25 +21,27 @@ public class StorageManagerDemoActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-        tv = (TextView) findViewById(R.id.tv);
+        tv = findViewById(R.id.tv);
         tv.setText("");
         StorageManager m = getSystemService(StorageManager.class);
-        List<StorageVolume> volumes = m.getStorageVolumes();
-        for (StorageVolume volume : volumes) {
-            appendLine(String.format("%s",
-                    volume.getDescription(this)));
-            appendLine(String.format("   getState(): %s",
-                    volume.getState()));
-            appendLine(String.format("   isPrimary(): %s",
-                    volume.isPrimary()));
-            appendLine(String.format("   isRemovable(): %s",
-                    volume.isRemovable()));
-            appendLine(String.format("   isEmulated(): %s",
-                    volume.isEmulated()));
-            if (volume.isPrimary()) {
-                Intent intent = volume.createAccessIntent(
-                        Environment.DIRECTORY_DOWNLOADS);
-                startActivityForResult(intent, REQUEST_CODE);
+        if (m != null) {
+            List<StorageVolume> volumes = m.getStorageVolumes();
+            for (StorageVolume volume : volumes) {
+                appendLine(String.format("%s",
+                        volume.getDescription(this)));
+                appendLine(String.format("   getState(): %s",
+                        volume.getState()));
+                appendLine(String.format("   isPrimary(): %s",
+                        volume.isPrimary()));
+                appendLine(String.format("   isRemovable(): %s",
+                        volume.isRemovable()));
+                appendLine(String.format("   isEmulated(): %s",
+                        volume.isEmulated()));
+                if (volume.isPrimary()) {
+                    Intent intent = volume.createAccessIntent(
+                            Environment.DIRECTORY_DOWNLOADS);
+                    startActivityForResult(intent, REQUEST_CODE);
+                }
             }
         }
     }

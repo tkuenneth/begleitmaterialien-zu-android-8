@@ -10,7 +10,8 @@ public class MediaMountedReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        if (intent != null) {
+        if ((intent != null) &&
+                (Intent.ACTION_MEDIA_MOUNTED.equals(intent.getAction()))) {
             StorageVolume volume = intent.getParcelableExtra(
                     StorageVolume.EXTRA_STORAGE_VOLUME);
             if (volume != null) {
