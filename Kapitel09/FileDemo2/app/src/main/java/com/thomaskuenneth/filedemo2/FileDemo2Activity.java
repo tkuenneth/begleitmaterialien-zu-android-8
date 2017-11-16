@@ -14,7 +14,7 @@ public class FileDemo2Activity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-        TextView tv = (TextView) findViewById(R.id.tv);
+        TextView tv = findViewById(R.id.tv);
         tv.setText("");
         // 10 Dateien mit unterschiedlicher Länge anlegen
         for (int i = 1; i <= 10; i++) {
