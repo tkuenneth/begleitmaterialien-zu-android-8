@@ -53,8 +53,7 @@ class DemoPrintDocumentAdapter extends PrintDocumentAdapter {
                             PrintDocumentInfo.CONTENT_TYPE_DOCUMENT)
                     .setPageCount(numPages)
                     .build();
-            callback.onLayoutFinished(info,
-                    !newAttributes.equals(oldAttributes));
+            callback.onLayoutFinished(info, true);
         } else {
             // einen Fehler melden
             callback.onLayoutFailed(
@@ -83,6 +82,12 @@ class DemoPrintDocumentAdapter extends PrintDocumentAdapter {
         try {
             pdf.writeTo(new FileOutputStream(
                     destination.getFileDescriptor()));
+        } catch (IOException e) {
+            callback.onWriteFailed(e.toString());
+            return;
+        }
+        try {
+            destination.close();
         } catch (IOException e) {
             callback.onWriteFailed(e.toString());
             return;
