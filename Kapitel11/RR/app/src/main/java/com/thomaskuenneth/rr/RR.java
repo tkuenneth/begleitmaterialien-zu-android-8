@@ -44,7 +44,7 @@ public class RR extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         // ListView initialisieren
-        final ListView lv = (ListView) findViewById(R.id.listview);
+        final ListView lv = findViewById(R.id.listview);
         listAdapter = new RRListAdapter(this);
         lv.setAdapter(listAdapter);
         lv.setOnItemClickListener((parent, view,
@@ -66,7 +66,7 @@ public class RR extends Activity {
             return true;
         });
         // Schaltfläche Aufnehmen/Beenden initialisieren
-        b = (Button) findViewById(R.id.button);
+        b = findViewById(R.id.button);
         b.setOnClickListener((v) -> {
             if (mode == MODE.WAITING) {
                 currentFile = recordToFile();
@@ -99,7 +99,7 @@ public class RR extends Activity {
                 != PackageManager.PERMISSION_GRANTED) {
             b.setEnabled(false);
             requestPermissions(new String[]
-                    {Manifest.permission.RECORD_AUDIO},
+                            {Manifest.permission.RECORD_AUDIO},
                     PERMISSIONS_RECORD_AUDIO);
         } else {
             b.setEnabled(true);
