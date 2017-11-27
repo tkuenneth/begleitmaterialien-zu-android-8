@@ -23,10 +23,10 @@ public class SpracherkennungsDemo extends Activity {
         super.onCreate(savedInstanceState);
         // Benutzeroberfläche anzeigen
         setContentView(R.layout.main);
-        Button button = (Button) findViewById(R.id.button);
+        Button button = findViewById(R.id.button);
         button.setOnClickListener((v) ->
                 startVoiceRecognitionActivity());
-        textview = (TextView) findViewById(R.id.textview);
+        textview = findViewById(R.id.textview);
         // Verfügbarkeit der Spracherkennung prüfen
         PackageManager pm = getPackageManager();
         List<ResolveInfo> activities =

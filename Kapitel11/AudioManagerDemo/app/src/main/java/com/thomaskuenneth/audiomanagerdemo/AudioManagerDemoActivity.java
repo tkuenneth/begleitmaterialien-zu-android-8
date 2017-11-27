@@ -21,7 +21,7 @@ public class AudioManagerDemoActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-        tv = (TextView) findViewById(R.id.tv);
+        tv = findViewById(R.id.tv);
     }
 
     @Override
@@ -45,7 +45,10 @@ public class AudioManagerDemoActivity extends Activity {
         // MediaSession konfigurieren
         session = new MediaSession(this,
                 getClass().getSimpleName());
-        session.setFlags(MediaSession.FLAG_HANDLES_MEDIA_BUTTONS);
+
+        // https://stackoverflow.com/a/46008566/5956451
+        // https://developer.android.com/reference/android/media/session/MediaSession.html#FLAG_HANDLES_MEDIA_BUTTONS
+        // session.setFlags(MediaSession.FLAG_HANDLES_MEDIA_BUTTONS);
         session.setCallback(new MediaSession.Callback() {
 
             @Override

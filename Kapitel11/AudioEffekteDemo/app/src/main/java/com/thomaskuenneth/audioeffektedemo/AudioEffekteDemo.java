@@ -46,7 +46,7 @@ public class AudioEffekteDemo extends Activity {
         }
         // Checkbox schaltet BassBoost aus und ein
         final CheckBox cbBassBoost =
-                (CheckBox) findViewById(R.id.cbBassBoost);
+                findViewById(R.id.cbBassBoost);
         cbBassBoost.setOnCheckedChangeListener((buttonView,
                                                 isChecked) -> {
             int result = bassBoost.setEnabled(isChecked);
@@ -62,7 +62,7 @@ public class AudioEffekteDemo extends Activity {
         virtualizer.setStrength((short) 1000);
         // Checkbox schaltet Virtualizer aus und ein
         final CheckBox cbVirtualizer =
-                (CheckBox) findViewById(R.id.cbVirtualizer);
+                findViewById(R.id.cbVirtualizer);
         cbVirtualizer.setOnCheckedChangeListener((buttonView,
                                                   isChecked) -> {
             int result = virtualizer.setEnabled(isChecked);
@@ -81,7 +81,7 @@ public class AudioEffekteDemo extends Activity {
         mediaPlayer.setAuxEffectSendLevel(1f);
         // Checkbox schaltet Hall aus und ein
         final CheckBox cbReverb =
-                (CheckBox) findViewById(R.id.cbReverb);
+                findViewById(R.id.cbReverb);
         cbReverb.setOnCheckedChangeListener((buttonView,
                                              isChecked) -> {
             int result = reverb.setEnabled(isChecked);
@@ -93,7 +93,7 @@ public class AudioEffekteDemo extends Activity {
         });
         cbReverb.setChecked(false);
         // Schaltfläche
-        button = (Button) findViewById(R.id.button);
+        button = findViewById(R.id.button);
         button.setOnClickListener((view) -> {
             if (playing) {
                 mediaPlayer.pause();

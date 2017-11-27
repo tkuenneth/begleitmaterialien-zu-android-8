@@ -88,9 +88,9 @@ public class TextToSpeechDemo extends Activity
         }
         // Activity initialisieren
         setContentView(R.layout.main);
-        input = (EditText) findViewById(R.id.input);
-        spinner = (Spinner) findViewById(R.id.locale);
-        button = (Button) findViewById(R.id.button);
+        input = findViewById(R.id.input);
+        spinner = findViewById(R.id.locale);
+        button = findViewById(R.id.button);
         button.setOnClickListener((v) -> {
             String text = input.getText().toString();
             String key = (String) spinner.getSelectedItem();

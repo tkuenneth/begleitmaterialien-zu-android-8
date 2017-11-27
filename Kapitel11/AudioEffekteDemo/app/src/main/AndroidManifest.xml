@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.thomaskuenneth.audioeffektedemo">
 
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <application
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:allowBackup="false">
+        android:allowBackup="false"
+        tools:ignore="GoogleAppIndexingWarning">
         <activity
             android:name=".AudioEffekteDemo"
             android:label="@string/app_name">
