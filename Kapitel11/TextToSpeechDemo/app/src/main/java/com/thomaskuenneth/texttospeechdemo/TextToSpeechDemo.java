@@ -109,6 +109,7 @@ public class TextToSpeechDemo extends Activity
                                 + ".wav");
                 tts.synthesizeToFile(text, null, file,
                         last_utterance_id);
+                Log.d(TAG, file.getAbsolutePath());
             }
         });
         tts.setOnUtteranceProgressListener(

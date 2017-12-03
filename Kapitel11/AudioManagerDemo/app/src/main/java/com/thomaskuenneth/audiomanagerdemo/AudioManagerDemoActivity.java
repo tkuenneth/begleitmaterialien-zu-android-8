@@ -45,10 +45,6 @@ public class AudioManagerDemoActivity extends Activity {
         // MediaSession konfigurieren
         session = new MediaSession(this,
                 getClass().getSimpleName());
-
-        // https://stackoverflow.com/a/46008566/5956451
-        // https://developer.android.com/reference/android/media/session/MediaSession.html#FLAG_HANDLES_MEDIA_BUTTONS
-        // session.setFlags(MediaSession.FLAG_HANDLES_MEDIA_BUTTONS);
         session.setCallback(new MediaSession.Callback() {
 
             @Override
