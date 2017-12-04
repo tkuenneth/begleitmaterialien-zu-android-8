@@ -3,9 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/ShareViaDemo.iml" filepath="$PROJECT_DIR$/ShareViaDemo.iml" />
-      <module fileurl="file://C:\Users\tkuen\Entwicklung\Bitbucket\begleit8\Kapitel12\ShareViaDemo\ShareViaDemo.iml" filepath="C:\Users\tkuen\Entwicklung\Bitbucket\begleit8\Kapitel12\ShareViaDemo\ShareViaDemo.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://C:\Users\tkuen\Entwicklung\Bitbucket\begleit8\Kapitel12\ShareViaDemo\app\app.iml" filepath="C:\Users\tkuen\Entwicklung\Bitbucket\begleit8\Kapitel12\ShareViaDemo\app\app.iml" />
     </modules>
   </component>
 </project>
