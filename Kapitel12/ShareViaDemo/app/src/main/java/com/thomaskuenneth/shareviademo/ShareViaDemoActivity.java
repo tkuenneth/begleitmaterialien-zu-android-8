@@ -11,7 +11,7 @@ public class ShareViaDemoActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-        Button b = (Button) findViewById(R.id.button);
+        Button b = findViewById(R.id.button);
         b.setOnClickListener((v) -> {
             Intent intent = new Intent(Intent.ACTION_VIEW);
             intent.setType("image/*");

@@ -34,37 +34,39 @@ public class DemoSender extends Activity {
         if ((intent != null) &&
                 (Intent.ACTION_SEND.equals(intent.getAction()))) {
             setContentView(R.layout.demosender);
-            ImageView imageView =
-                    (ImageView) findViewById(R.id.image);
+            ImageView imageView = findViewById(R.id.image);
             // Uri des erhaltenen Bildes
-            Uri imageUri = (Uri) intent.getExtras().get(
-                    Intent.EXTRA_STREAM);
-            try {
-                // Bitmap erzeugen
-                Bitmap bm1 = MediaStore.Images.Media.getBitmap(
-                        getContentResolver(), imageUri);
-                // in Graustufen umwandeln und anzeigen
-                greyscaleBitmap = toGrayscale(bm1);
-                bm1.recycle();
-                imageView.setImageBitmap(greyscaleBitmap);
-            } catch (IOException e) {
-                Log.e(TAG, e.getClass().getSimpleName(), e);
-            }
-            // Button
-            final Button button = (Button) findViewById(R.id.button);
-            button.setOnClickListener((v) -> {
-                if (checkSelfPermission(
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                        != PackageManager.PERMISSION_GRANTED) {
-                    requestPermissions(new String[]
-                                    {Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                            PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
-                } else {
-                    share();
+            Bundle b = intent.getExtras();
+            if (b != null) {
+                Uri imageUri = (Uri) b.get(
+                        Intent.EXTRA_STREAM);
+                try {
+                    // Bitmap erzeugen
+                    Bitmap bm1 = MediaStore.Images.Media.getBitmap(
+                            getContentResolver(), imageUri);
+                    // in Graustufen umwandeln und anzeigen
+                    greyscaleBitmap = toGrayscale(bm1);
+                    bm1.recycle();
+                    imageView.setImageBitmap(greyscaleBitmap);
+                } catch (IOException e) {
+                    Log.e(TAG, e.getClass().getSimpleName(), e);
                 }
-            });
-        } else {
-            finish();
+                // Button
+                final Button button = findViewById(R.id.button);
+                button.setOnClickListener((v) -> {
+                    if (checkSelfPermission(
+                            Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                            != PackageManager.PERMISSION_GRANTED) {
+                        requestPermissions(new String[]
+                                        {Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                                PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
+                    } else {
+                        share();
+                    }
+                });
+            } else {
+                finish();
+            }
         }
     }
 

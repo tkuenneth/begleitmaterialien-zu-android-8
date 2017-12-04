@@ -15,7 +15,6 @@ import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.Image;
 import android.media.ImageReader;
 import android.media.MediaScannerConnection;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -160,8 +159,7 @@ public class KameraDemo3 extends Activity
     }
 
     private void doIt() {
-        SurfaceView view =
-                (SurfaceView) findViewById(R.id.view);
+        SurfaceView view = findViewById(R.id.view);
         holder = view.getHolder();
         // CameraManager-Instanz ermitteln
         manager = getSystemService(CameraManager.class);
@@ -308,7 +306,12 @@ public class KameraDemo3 extends Activity
     private void saveJPG(ByteBuffer data) {
         File dir = getExternalFilesDir(
                 Environment.DIRECTORY_PICTURES);
-        dir.mkdirs();
+        if (dir == null) {
+            return;
+        }
+        if (dir.mkdirs()) {
+            Log.d(TAG, "dir created");
+        }
         File f = new File(dir, TAG + "_"
                 + Long.toString(System.currentTimeMillis())
                 + ".jpg");

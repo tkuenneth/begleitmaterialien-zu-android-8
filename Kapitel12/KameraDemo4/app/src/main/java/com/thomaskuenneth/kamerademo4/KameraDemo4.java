@@ -21,10 +21,12 @@ import android.util.Log;
 import android.util.Size;
 import android.view.Surface;
 import android.widget.Button;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
 import android.widget.Toast;
 
 public class KameraDemo4 extends Activity {
@@ -45,7 +47,7 @@ public class KameraDemo4 extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-        startStop = (Button) findViewById(R.id.button);
+        startStop = findViewById(R.id.button);
         startStop.setOnClickListener((v) -> {
                     if (!recording) {
                         try {
@@ -111,6 +113,9 @@ public class KameraDemo4 extends Activity {
         String cameraId = null;
         Size[] sizes = null;
         try {
+            if (manager == null) {
+                return;
+            }
             String[] ids = manager.getCameraIdList();
             for (String id : ids) {
                 CameraCharacteristics cc =
@@ -251,21 +256,19 @@ public class KameraDemo4 extends Activity {
         MediaScannerConnection.scanFile(this,
                 new String[]{getFilename()},
                 new String[]{"video/mpeg"},
-                (path, uri) -> {
-                    runOnUiThread(() -> {
-                        Intent i = new Intent(Intent.ACTION_VIEW,
-                                uri);
-                        try {
-                            startActivity(i);
-                        } catch (ActivityNotFoundException e) {
-                            Toast.makeText(this,
-                                    R.string.no_app,
-                                    Toast.LENGTH_LONG).show();
-                        } finally {
-                            Log.d(TAG, path);
-                            finish();
-                        }
-                    });
-                });
+                (path, uri) -> runOnUiThread(() -> {
+                    Intent i = new Intent(Intent.ACTION_VIEW,
+                            uri);
+                    try {
+                        startActivity(i);
+                    } catch (ActivityNotFoundException e) {
+                        Toast.makeText(this,
+                                R.string.no_app,
+                                Toast.LENGTH_LONG).show();
+                    } finally {
+                        Log.d(TAG, path);
+                        finish();
+                    }
+                }));
     }
 }

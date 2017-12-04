@@ -21,7 +21,6 @@ import android.view.SurfaceView;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Exchanger;
 
 public class KameraDemo3 extends Activity
         implements SurfaceHolder.Callback {
@@ -92,8 +91,7 @@ public class KameraDemo3 extends Activity
         if (holder != null) {
             holder.addCallback(this);
         }
-        SurfaceView view =
-                (SurfaceView) findViewById(R.id.view);
+        SurfaceView view = findViewById(R.id.view);
         if (view.isShown()) {
             try {
                 openCamera();
@@ -157,8 +155,7 @@ public class KameraDemo3 extends Activity
     }
 
     private void doIt() {
-        SurfaceView view =
-                (SurfaceView) findViewById(R.id.view);
+        SurfaceView view = findViewById(R.id.view);
         holder = view.getHolder();
         // CameraManager-Instanz ermitteln
         manager = getSystemService(CameraManager.class);

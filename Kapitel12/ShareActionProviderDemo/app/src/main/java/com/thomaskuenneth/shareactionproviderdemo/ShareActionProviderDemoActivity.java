@@ -18,7 +18,7 @@ public class ShareActionProviderDemoActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-        input = (EditText) findViewById(R.id.input);
+        input = findViewById(R.id.input);
         input.addTextChangedListener(new TextWatcher() {
 
             @Override
