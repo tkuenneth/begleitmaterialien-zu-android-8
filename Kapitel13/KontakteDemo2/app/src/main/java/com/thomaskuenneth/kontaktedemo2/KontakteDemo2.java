@@ -29,7 +29,7 @@ public class KontakteDemo2 extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-        tv = (TextView) findViewById(R.id.tv);
+        tv = findViewById(R.id.tv);
     }
 
     @Override
@@ -83,6 +83,7 @@ public class KontakteDemo2 extends Activity {
             mainQueryCursor.close();
         }
     }
+
     private void infosAuslesen(ContentResolver contentResolver,
                                String contactId) {
         String[] dataQueryProjection = new String[]{

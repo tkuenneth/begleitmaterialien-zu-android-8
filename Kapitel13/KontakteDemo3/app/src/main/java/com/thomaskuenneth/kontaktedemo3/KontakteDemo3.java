@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.RawContacts;
 import android.util.Log;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
