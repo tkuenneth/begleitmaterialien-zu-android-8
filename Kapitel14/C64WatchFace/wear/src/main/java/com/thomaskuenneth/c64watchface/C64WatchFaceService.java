@@ -1,6 +1,6 @@
 /*
  * This file is part of C64 Tribute Watch Face
- * Copyright (C) 2014  Thomas Kuenneth
+ * Copyright (C) 2014 - 2017  Thomas Kuenneth
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,33 +21,26 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.support.wearable.watchface.WatchFaceStyle;
 import android.text.format.DateFormat;
-import android.text.format.Time;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.SurfaceHolder;
 import android.view.WindowInsets;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.wearable.DataApi;
-import com.google.android.gms.wearable.DataEvent;
-import com.google.android.gms.wearable.DataEventBuffer;
-import com.google.android.gms.wearable.DataItem;
-import com.google.android.gms.wearable.DataMap;
-import com.google.android.gms.wearable.DataMapItem;
-import com.google.android.gms.wearable.Wearable;
-
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 import java.util.TimeZone;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * This class implements a Commodore 64 like watch face.
@@ -56,21 +49,22 @@ import java.util.TimeZone;
  */
 public class C64WatchFaceService extends CanvasWatchFaceService {
 
-    private static final String TAG =
-            C64WatchFaceService.class.getSimpleName();
+    public static final String PREFS_NAME = C64WatchFaceService.class.getSimpleName();
+    public static final String PREFS_DATE = "date";
+    public static final String PREFS_SECONDS = "seconds";
+    public static final String PREFS_UPPERCASE = "uppercase";
+
+    private SharedPreferences prefs;
 
     @Override
     public Engine onCreateEngine() {
+        prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         return new Engine();
     }
 
-    private class Engine extends CanvasWatchFaceService.Engine
-            implements DataApi.DataListener,
-            GoogleApiClient.ConnectionCallbacks,
-            GoogleApiClient.OnConnectionFailedListener {
+    private class Engine extends CanvasWatchFaceService.Engine {
 
         private static final int INTERACTIVE_UPDATE_RATE_MS = 333;
-        private static final int MSG_UPDATE_TIME = 0;
 
         // Commodore 64 colour 14 (http://unusedino.de/ec64/technical/misc/vic656x/colors/)
         private static final int LIGHT_BLUE = 0xff6C5EB5;
@@ -90,64 +84,28 @@ public class C64WatchFaceService extends CanvasWatchFaceService {
         // C64 cursor visible
         private boolean c64CursorVisible;
 
-        // seconds visible?
-        private boolean seconds;
-
-        // date visible?
-        private boolean dateVisible;
-
-        /* handler to update the time 3 times a second in interactive mode */
-        final Handler mUpdateTimeHandler = new Handler() {
-            @Override
-            public void handleMessage(Message message) {
-                switch (message.what) {
-                    case MSG_UPDATE_TIME:
-                        c64CursorVisible = !c64CursorVisible;
-                        invalidate();
-                        if (shouldTimerBeRunning()) {
-                            long timeMs = System.currentTimeMillis();
-                            long delayMs =
-                                    INTERACTIVE_UPDATE_RATE_MS
-                                    - (timeMs
-                                            % INTERACTIVE_UPDATE_RATE_MS);
-                            mUpdateTimeHandler.sendEmptyMessageDelayed(
-                                    MSG_UPDATE_TIME, delayMs);
-                        }
-                        break;
-                }
-            }
-        };
-
-        GoogleApiClient mGoogleApiClient = new
-                GoogleApiClient.Builder(C64WatchFaceService.this)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(Wearable.API)
-                .build();
+        final Calendar cal = Calendar.getInstance();
 
         /* receiver to update the time zone */
         final BroadcastReceiver mTimeZoneReceiver =
                 new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                mTime.clear(intent.getStringExtra("time-zone"));
-                mTime.setToNow();
-            }
-        };
+                    @Override
+                    public void onReceive(Context context, Intent intent) {
+                        cal.setTimeZone(TimeZone.getTimeZone(intent.getStringExtra("time-zone")));
+                        setCalToNow();
+                    }
+                };
         boolean mRegisteredTimeZoneReceiver;
 
         Paint borderPaint;
         Paint backgroundPaint;
         Paint textPaint;
-        Time mTime;
         boolean isRound = false;
 
         @Override
         public void onCreate(SurfaceHolder holder) {
             super.onCreate(holder);
-            seconds = false;
-            dateVisible = false;
-            mTime = new Time();
+            setCalToNow();
             mRegisteredTimeZoneReceiver = false;
             last = -1;
             textPaint = new Paint();
@@ -157,18 +115,10 @@ public class C64WatchFaceService extends CanvasWatchFaceService {
             borderPaint = new Paint();
             backgroundPaint = new Paint();
             setupPaint(false);
-                /* configure the system UI */
             setWatchFaceStyle(
                     new WatchFaceStyle.Builder(C64WatchFaceService.this)
-                    .setCardPeekMode(WatchFaceStyle.PEEK_MODE_SHORT)
-                    .setBackgroundVisibility(WatchFaceStyle
-                            .BACKGROUND_VISIBILITY_INTERRUPTIVE)
-                    .setShowSystemUiTime(false)
-                    .setStatusBarGravity(Gravity.START | Gravity.TOP)
-                    .setHotwordIndicatorGravity(
-                            Gravity.CENTER_HORIZONTAL |
-                            Gravity.BOTTOM)
-                    .build());
+                            .setStatusBarGravity(Gravity.START | Gravity.TOP)
+                            .build());
             c64CursorVisible = false;
         }
 
@@ -199,36 +149,38 @@ public class C64WatchFaceService extends CanvasWatchFaceService {
 
         @Override
         public void onDraw(Canvas canvas, Rect bounds) {
-            mTime.setToNow();
+            boolean dateVisible = prefs.getBoolean(PREFS_DATE, false);
+            boolean seconds = prefs.getBoolean(PREFS_SECONDS, false);
+            setCalToNow();
             String strDate;
             if (dateVisible) {
-                String strWeekday = mTime.format("%a");
+                String strWeekday = new SimpleDateFormat("EE", Locale.getDefault()).format(cal.getTime());
                 if (strWeekday.endsWith(".")) {
                     strWeekday = strWeekday.substring(0,
                             strWeekday.length() - 1);
                 }
-                strDate = strWeekday + " " + mTime.format("%d");
+                strDate = strWeekday + " " + cal.get(Calendar.DAY_OF_MONTH);
             } else {
                 strDate = "";
             }
             String patternTime;
             if (DateFormat.is24HourFormat(getBaseContext())) {
-                if (seconds) {
-                    patternTime = mTime.format("%H:%M:%S");
-                } else {
-                    patternTime = mTime.format("%H:%M");
-                }
+                patternTime = "HH:mm";
             } else {
-                if (seconds) {
-                    patternTime = mTime.format("%I:%M:%S %p");
-                } else {
-                    patternTime = mTime.format("%I:%M %p");
-                }
+                patternTime = "KK:mm";
             }
-            String strTime = mTime.format(patternTime);
-            while (strDate.length() > strTime.length()) {
-                strTime = strTime + " ";
+            if (seconds) {
+                patternTime += ":ss";
             }
+            if (!DateFormat.is24HourFormat(getBaseContext())) {
+                patternTime += " a";
+            }
+            StringBuilder sb = new StringBuilder(new SimpleDateFormat(patternTime,
+                    Locale.getDefault()).format(cal.getTime()));
+            while (strDate.length() > sb.length()) {
+                sb.append(" ");
+            }
+            String strTime = sb.toString();
             int w = bounds.width();
             int h = bounds.height();
             int borderHeight = (int) (((float) h / 100f) * 5f);
@@ -245,6 +197,11 @@ public class C64WatchFaceService extends CanvasWatchFaceService {
                         backgroundPaint);
             } else {
                 canvas.drawRect(r, backgroundPaint);
+            }
+
+            if (prefs.getBoolean(PREFS_UPPERCASE, false)) {
+                strTime = strTime.toUpperCase();
+                strDate = strDate.toUpperCase();
             }
 
             if (last == -1) {
@@ -282,128 +239,22 @@ public class C64WatchFaceService extends CanvasWatchFaceService {
         public void onVisibilityChanged(boolean visible) {
             super.onVisibilityChanged(visible);
             if (visible) {
-                mGoogleApiClient.connect();
                 registerReceiver();
                 // Update time zone in case it changed while we weren't visible.
-                mTime.clear(TimeZone.getDefault().getID());
-                mTime.setToNow();
+                cal.setTimeZone(TimeZone.getDefault());
+                setCalToNow();
+                last = -1;
             } else {
                 unregisterReceiver();
-                if (mGoogleApiClient != null &&
-                        mGoogleApiClient.isConnected()) {
-                    Wearable.DataApi.removeListener(mGoogleApiClient,
-                            this);
-                    mGoogleApiClient.disconnect();
-                }
             }
             // Whether the timer should be running depends on whether we're visible and
             // whether we're in ambient mode), so we may need to start or stop the timer
             updateTimer();
         }
 
-        @Override // DataApi.DataListener
-        public void onDataChanged(DataEventBuffer dataEvents) {
-            try {
-                for (DataEvent dataEvent : dataEvents) {
-                    if (dataEvent.getType() != DataEvent.TYPE_CHANGED) {
-                        continue;
-                    }
-
-                    DataItem dataItem = dataEvent.getDataItem();
-                    if (!dataItem.getUri().getPath().equals(
-                            C64WatchFaceUtil.PATH_WITH_FEATURE)) {
-                        continue;
-                    }
-
-                    DataMapItem dataMapItem =
-                            DataMapItem.fromDataItem(dataItem);
-                    DataMap config = dataMapItem.getDataMap();
-                    if (Log.isLoggable(TAG, Log.DEBUG)) {
-                        Log.d(TAG, "Config DataItem updated:" + config);
-                    }
-                    updateUiForConfigDataMap(config);
-                }
-            } finally {
-                dataEvents.close();
-            }
-        }
-
-        @Override  // GoogleApiClient.ConnectionCallbacks
-        public void onConnected(Bundle connectionHint) {
-            if (Log.isLoggable(TAG, Log.DEBUG)) {
-                Log.d(TAG, "onConnected: " + connectionHint);
-            }
-            Wearable.DataApi.addListener(mGoogleApiClient, Engine.this);
-            updateConfigDataItemAndUiOnStartup();
-        }
-
-        @Override  // GoogleApiClient.ConnectionCallbacks
-        public void onConnectionSuspended(int cause) {
-            if (Log.isLoggable(TAG, Log.DEBUG)) {
-                Log.d(TAG, "onConnectionSuspended: " + cause);
-            }
-        }
-
-        @Override  // GoogleApiClient.OnConnectionFailedListener
-        public void onConnectionFailed(ConnectionResult result) {
-            if (Log.isLoggable(TAG, Log.DEBUG)) {
-                Log.d(TAG, "onConnectionFailed: " + result);
-            }
-        }
-
-        private void updateUiForConfigDataMap(final DataMap config) {
-            boolean uiUpdated = false;
-            for (String configKey : config.keySet()) {
-                if (configKey.equals(C64WatchFaceUtil.KEY_SECONDS_VISIBLE)) {
-                    seconds = config.getBoolean(configKey);
-                    uiUpdated = true;
-                    continue;
-                }
-                if (configKey.equals(C64WatchFaceUtil.KEY_DATE_VISIBLE)) {
-                    dateVisible = config.getBoolean(configKey);
-                    uiUpdated = true;
-                    continue;
-                }
-            }
-            if (uiUpdated) {
-                last = -1;
-                invalidate();
-            }
-        }
-
-        private void updateConfigDataItemAndUiOnStartup() {
-            C64WatchFaceUtil.fetchConfigDataMap(mGoogleApiClient,
-                    new C64WatchFaceUtil.FetchConfigDataMapCallback() {
-                        @Override
-                        public void onConfigDataMapFetched(
-                                DataMap startupConfig) {
-                            // If the DataItem hasn't been created yet or some keys are missing,
-                            // use the default values.
-                            addBooleanKeyIfMissing(startupConfig,
-                                    C64WatchFaceUtil.KEY_SECONDS_VISIBLE,
-                                    false);
-                            addBooleanKeyIfMissing(startupConfig,
-                                    C64WatchFaceUtil.KEY_DATE_VISIBLE,
-                                    false);
-                            C64WatchFaceUtil.putConfigDataItem(mGoogleApiClient,
-                                    startupConfig);
-                            updateUiForConfigDataMap(startupConfig);
-                        }
-                    }
-            );
-        }
-
-        private void addBooleanKeyIfMissing(DataMap config,
-                                            String key, boolean value) {
-            if (!config.containsKey(key)) {
-                config.putBoolean(key, value);
-            }
-        }
-
         private void updateTimer() {
-            mUpdateTimeHandler.removeMessages(MSG_UPDATE_TIME);
             if (shouldTimerBeRunning()) {
-                mUpdateTimeHandler.sendEmptyMessage(MSG_UPDATE_TIME);
+                pulse();
             }
         }
 
@@ -436,6 +287,23 @@ public class C64WatchFaceService extends CanvasWatchFaceService {
             borderPaint.setColor(inAmbientMode ? BLACK : LIGHT_BLUE);
             backgroundPaint.setColor(inAmbientMode ? BLACK : BLUE);
             textPaint.setAntiAlias(!inAmbientMode);
+        }
+
+        private void setCalToNow() {
+            cal.setTime(new Date());
+        }
+
+        private void pulse() {
+            new Timer().schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    c64CursorVisible = !c64CursorVisible;
+                    invalidate();
+                    if (shouldTimerBeRunning()) {
+                        pulse();
+                    }
+                }
+            }, INTERACTIVE_UPDATE_RATE_MS);
         }
     }
 }
