@@ -18,12 +18,12 @@ import android.util.Size;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class KameraDemo3 extends Activity
-        implements SurfaceHolder.Callback {
+public class KameraDemo3 extends Activity {
 
     private static final String TAG =
             KameraDemo3.class.getSimpleName();
@@ -35,46 +35,86 @@ public class KameraDemo3 extends Activity
     private CameraDevice camera;
     private String cameraId;
     private CameraCaptureSession activeSession;
-
     private CaptureRequest.Builder builderPreview;
-    private CameraCaptureSession.CaptureCallback
+    private SurfaceView surfaceView;
+
+    private final CameraCaptureSession.CaptureCallback
             captureCallback = null;
-    private CameraCaptureSession.StateCallback captureSessionCallback =
+
+    private final CameraCaptureSession.StateCallback captureSessionCallback =
             new CameraCaptureSession.StateCallback() {
 
                 @Override
-                public void onConfigured(
-                        CameraCaptureSession session) {
+                public void onConfigured(CameraCaptureSession session) {
                     try {
                         session.setRepeatingRequest(
                                 builderPreview.build(),
                                 captureCallback, null);
                         KameraDemo3.this.activeSession = session;
-
                     } catch (CameraAccessException e) {
                         Log.e(TAG, "onConfigured()", e);
                     }
                 }
 
                 @Override
-                public void onConfigureFailed(
-                        CameraCaptureSession session) {
+                public void onConfigureFailed(CameraCaptureSession session) {
                     Log.e(TAG, "onConfigureFailed()");
                 }
             };
+
+    private final SurfaceHolder.Callback surfaceHolderCallback
+            = new SurfaceHolder.Callback() {
+
+        @Override
+        public void surfaceDestroyed(SurfaceHolder holder) {
+            Log.d(TAG, "surfaceDestroyed()");
+        }
+
+        @Override
+        public void surfaceCreated(SurfaceHolder holder) {
+            Log.d(TAG, "surfaceCreated()");
+            try {
+                openCamera();
+            } catch (SecurityException |
+                    CameraAccessException e) {
+                Log.e(TAG, "openCamera()", e);
+            }
+        }
+
+        @Override
+        public void surfaceChanged(SurfaceHolder holder,
+                                   int format, int width,
+                                   int height) {
+            Log.d(TAG, "surfaceChanged()");
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+        surfaceView = findViewById(R.id.view);
         holder = null;
         camera = null;
         cameraId = null;
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
+    protected void onPause() {
+        super.onPause();
+        surfaceView.setVisibility(View.GONE);
+        if (camera != null) {
+            if (activeSession != null) {
+                activeSession.close();
+                activeSession = null;
+            }
+            camera.close();
+            camera = null;
+        }
+        if (holder != null) {
+            holder.removeCallback(surfaceHolderCallback);
+        }
+        Log.d(TAG, "onPause()");
     }
 
     @Override
@@ -86,38 +126,9 @@ public class KameraDemo3 extends Activity
                             {Manifest.permission.CAMERA},
                     PERMISSIONS_REQUEST_CAMERA);
         } else {
-            doIt();
-        }
-        if (holder != null) {
-            holder.addCallback(this);
-        }
-        SurfaceView view = findViewById(R.id.view);
-        if (view.isShown()) {
-            try {
-                openCamera();
-            } catch (SecurityException |
-                    CameraAccessException e) {
-                Log.e(TAG, "openCamera()", e);
-            }
+            configureHolder();
         }
         Log.d(TAG, "onResume()");
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        if (camera != null) {
-            if (activeSession != null) {
-                activeSession.close();
-                activeSession = null;
-            }
-            camera.close();
-            camera = null;
-        }
-        if (holder != null) {
-            holder.removeCallback(this);
-        }
-        Log.d(TAG, "onPause()");
     }
 
     @Override
@@ -127,36 +138,13 @@ public class KameraDemo3 extends Activity
         if ((requestCode == PERMISSIONS_REQUEST_CAMERA) &&
                 (grantResults.length > 0 && grantResults[0] ==
                         PackageManager.PERMISSION_GRANTED)) {
-            doIt();
+            configureHolder();
         }
     }
 
-    @Override
-    public void surfaceDestroyed(SurfaceHolder holder) {
-        Log.d(TAG, "surfaceDestroyed()");
-    }
-
-    @Override
-    public void surfaceCreated(SurfaceHolder holder) {
-        Log.d(TAG, "surfaceCreated()");
-        try {
-            openCamera();
-        } catch (SecurityException |
-                CameraAccessException e) {
-            Log.e(TAG, "openCamera()", e);
-        }
-    }
-
-    @Override
-    public void surfaceChanged(SurfaceHolder holder,
-                               int format, int width,
-                               int height) {
-        Log.d(TAG, "surfaceChanged()");
-    }
-
-    private void doIt() {
-        SurfaceView view = findViewById(R.id.view);
-        holder = view.getHolder();
+    private void configureHolder() {
+        holder = surfaceView.getHolder();
+        holder.addCallback(surfaceHolderCallback);
         // CameraManager-Instanz ermitteln
         manager = getSystemService(CameraManager.class);
         Size[] sizes = findCameraFacingBack();
@@ -184,15 +172,9 @@ public class KameraDemo3 extends Activity
                 finish();
             }
         }
+        surfaceView.setVisibility(View.VISIBLE);
     }
 
-    /**
-     * Sucht Kamera auf Geräterückseite und liefert
-     * Infos zur Auflösung. Setzt auch die Variable
-     * <code>cameraId</code>
-     *
-     * @return Auflösung
-     */
     private Size[] findCameraFacingBack() {
         Size[] sizes = null;
         try {
