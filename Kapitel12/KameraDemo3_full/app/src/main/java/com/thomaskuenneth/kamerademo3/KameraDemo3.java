@@ -24,6 +24,7 @@ import android.util.Size;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
 import android.widget.Toast;
 
 import java.io.BufferedOutputStream;
@@ -34,8 +35,7 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-public class KameraDemo3 extends Activity
-        implements SurfaceHolder.Callback {
+public class KameraDemo3 extends Activity {
 
     private static final String TAG =
             KameraDemo3.class.getSimpleName();
@@ -47,18 +47,19 @@ public class KameraDemo3 extends Activity
     private CameraDevice camera;
     private String cameraId;
     private CameraCaptureSession activeSession;
-
     private CaptureRequest.Builder builderPreview;
+    private SurfaceView surfaceView;
     private CaptureRequest.Builder builderPicture;
     private ImageReader imageReader;
-    private CameraCaptureSession.CaptureCallback
+
+    private final CameraCaptureSession.CaptureCallback
             captureCallback = null;
-    private CameraCaptureSession.StateCallback captureSessionCallback =
+
+    private final CameraCaptureSession.StateCallback captureSessionCallback =
             new CameraCaptureSession.StateCallback() {
 
                 @Override
-                public void onConfigured(
-                        CameraCaptureSession session) {
+                public void onConfigured(CameraCaptureSession session) {
                     try {
                         session.setRepeatingRequest(
                                 builderPreview.build(),
@@ -70,46 +71,52 @@ public class KameraDemo3 extends Activity
                 }
 
                 @Override
-                public void onConfigureFailed(
-                        CameraCaptureSession session) {
+                public void onConfigureFailed(CameraCaptureSession session) {
                     Log.e(TAG, "onConfigureFailed()");
                 }
             };
+
+    private final SurfaceHolder.Callback surfaceHolderCallback
+            = new SurfaceHolder.Callback() {
+
+        @Override
+        public void surfaceDestroyed(SurfaceHolder holder) {
+            Log.d(TAG, "surfaceDestroyed()");
+        }
+
+        @Override
+        public void surfaceCreated(SurfaceHolder holder) {
+            Log.d(TAG, "surfaceCreated()");
+            try {
+                openCamera();
+            } catch (SecurityException |
+                    CameraAccessException e) {
+                Log.e(TAG, "openCamera()", e);
+            }
+        }
+
+        @Override
+        public void surfaceChanged(SurfaceHolder holder,
+                                   int format, int width,
+                                   int height) {
+            Log.d(TAG, "surfaceChanged()");
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+        surfaceView = findViewById(R.id.view);
         holder = null;
         camera = null;
         cameraId = null;
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        if (checkSelfPermission(Manifest.permission.CAMERA)
-                != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]
-                            {Manifest.permission.CAMERA},
-                    PERMISSIONS_REQUEST_CAMERA);
-        } else {
-            doIt();
-        }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (holder != null) {
-            holder.addCallback(this);
-        }
-        Log.d(TAG, "onResume()");
-    }
-
-    @Override
     protected void onPause() {
         super.onPause();
+        surfaceView.setVisibility(View.GONE);
         if (camera != null) {
             if (activeSession != null) {
                 activeSession.close();
@@ -119,9 +126,23 @@ public class KameraDemo3 extends Activity
             camera = null;
         }
         if (holder != null) {
-            holder.removeCallback(this);
+            holder.removeCallback(surfaceHolderCallback);
         }
         Log.d(TAG, "onPause()");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (checkSelfPermission(Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]
+                            {Manifest.permission.CAMERA},
+                    PERMISSIONS_REQUEST_CAMERA);
+        } else {
+            configureHolder();
+        }
+        Log.d(TAG, "onResume()");
     }
 
     @Override
@@ -131,36 +152,13 @@ public class KameraDemo3 extends Activity
         if ((requestCode == PERMISSIONS_REQUEST_CAMERA) &&
                 (grantResults.length > 0 && grantResults[0] ==
                         PackageManager.PERMISSION_GRANTED)) {
-            doIt();
+            configureHolder();
         }
     }
 
-    @Override
-    public void surfaceDestroyed(SurfaceHolder holder) {
-        Log.d(TAG, "surfaceDestroyed()");
-    }
-
-    @Override
-    public void surfaceCreated(SurfaceHolder holder) {
-        Log.d(TAG, "surfaceCreated()");
-        try {
-            openCamera();
-        } catch (SecurityException |
-                CameraAccessException e) {
-            Log.e(TAG, "openCamera()", e);
-        }
-    }
-
-    @Override
-    public void surfaceChanged(SurfaceHolder holder,
-                               int format, int width,
-                               int height) {
-        Log.d(TAG, "surfaceChanged()");
-    }
-
-    private void doIt() {
-        SurfaceView view = findViewById(R.id.view);
-        holder = view.getHolder();
+    private void configureHolder() {
+        holder = surfaceView.getHolder();
+        holder.addCallback(surfaceHolderCallback);
         // CameraManager-Instanz ermitteln
         manager = getSystemService(CameraManager.class);
         Size[] sizes = findCameraFacingBack();
@@ -198,17 +196,11 @@ public class KameraDemo3 extends Activity
                 Log.d(TAG, "Zu groß");
                 finish();
             }
-            view.setOnClickListener((v) -> takePicture());
+            surfaceView.setOnClickListener((v) -> takePicture());
         }
+        surfaceView.setVisibility(View.VISIBLE);
     }
 
-    /**
-     * Sucht Kamera auf Geräterückseite und liefert
-     * Infos zur Auflösung. Setzt auch die Variable
-     * <code>cameraId</code>
-     *
-     * @return Auflösung
-     */
     private Size[] findCameraFacingBack() {
         Size[] sizes = null;
         try {
@@ -233,7 +225,8 @@ public class KameraDemo3 extends Activity
                             CameraCharacteristics.
                                     SCALER_STREAM_CONFIGURATION_MAP);
                     if (configs != null) {
-                        sizes = configs.getOutputSizes(SurfaceHolder.class);
+                        sizes =
+                                configs.getOutputSizes(SurfaceHolder.class);
                     }
                 }
             }
@@ -274,21 +267,19 @@ public class KameraDemo3 extends Activity
         List<Surface> outputs = new ArrayList<>();
         outputs.add(holder.getSurface());
         try {
-            // Builder für Vorschau
-            builderPreview = camera.createCaptureRequest(
-                    CameraDevice.TEMPLATE_PREVIEW);
-            builderPreview.addTarget(holder.getSurface());
-            // Builder für die Aufnahme
             Surface surface = imageReader.getSurface();
             outputs.add(surface);
             builderPicture =
                     camera.createCaptureRequest(
                             CameraDevice.TEMPLATE_STILL_CAPTURE);
             builderPicture.addTarget(surface);
+            builderPreview = camera.createCaptureRequest(
+                    CameraDevice.TEMPLATE_PREVIEW);
+            builderPreview.addTarget(holder.getSurface());
             camera.createCaptureSession(outputs,
                     captureSessionCallback,
                     new Handler());
-        } catch (CameraAccessException e) {
+        } catch (Exception e) {
             Log.e(TAG, "createPreviewCaptureSession()", e);
         }
     }
@@ -306,28 +297,27 @@ public class KameraDemo3 extends Activity
     private void saveJPG(ByteBuffer data) {
         File dir = getExternalFilesDir(
                 Environment.DIRECTORY_PICTURES);
-        if (dir == null) {
-            return;
-        }
-        if (dir.mkdirs()) {
-            Log.d(TAG, "dir created");
-        }
-        File f = new File(dir, TAG + "_"
-                + Long.toString(System.currentTimeMillis())
-                + ".jpg");
-        Log.d(TAG, "Dateiname: " + f.getAbsolutePath());
-        try (
-                FileOutputStream fos = new FileOutputStream(f);
-                BufferedOutputStream bos = new BufferedOutputStream(fos)
-        ) {
-            while (data.hasRemaining()) {
-                bos.write(data.get());
+        if (dir != null) {
+            if (dir.mkdirs()) {
+                Log.d(TAG, "dirs created");
             }
-            Toast.makeText(this, R.string.click,
-                    Toast.LENGTH_SHORT).show();
-            addToMediaProvider(f);
-        } catch (IOException e) {
-            Log.e(TAG, "saveJPG()", e);
+            File f = new File(dir, TAG + "_"
+                    + Long.toString(System.currentTimeMillis())
+                    + ".jpg");
+            Log.d(TAG, "Dateiname: " + f.getAbsolutePath());
+            try (
+                    FileOutputStream fos = new FileOutputStream(f);
+                    BufferedOutputStream bos = new BufferedOutputStream(fos)
+            ) {
+                while (data.hasRemaining()) {
+                    bos.write(data.get());
+                }
+                Toast.makeText(this, R.string.click,
+                        Toast.LENGTH_SHORT).show();
+                addToMediaProvider(f);
+            } catch (IOException e) {
+                Log.e(TAG, "saveJPG()", e);
+            }
         }
     }
 
@@ -342,4 +332,5 @@ public class KameraDemo3 extends Activity
                     startActivity(i);
                 });
     }
+
 }
