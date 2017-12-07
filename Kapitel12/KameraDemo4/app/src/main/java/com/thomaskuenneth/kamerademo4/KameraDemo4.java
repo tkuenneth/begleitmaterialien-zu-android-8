@@ -17,31 +17,33 @@ import android.media.MediaScannerConnection;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.util.Log;
 import android.util.Size;
 import android.view.Surface;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 import android.widget.Button;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.widget.Toast;
-
 public class KameraDemo4 extends Activity {
 
     private static final String TAG =
             KameraDemo4.class.getSimpleName();
-    private static final int PERMISSIONS_REQUEST_RECORD
-            = 123;
+    private static final int RQ_RECORD = 123;
 
+    private HandlerThread backgroundThread;
+    private Handler backgroundHandler;
     private CameraDevice camera;
     private CameraCaptureSession activeSession;
     private MediaRecorder recorder;
     private boolean recording;
     private Button startStop;
-    private CaptureRequest.Builder builder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,19 +52,15 @@ public class KameraDemo4 extends Activity {
         startStop = findViewById(R.id.button);
         startStop.setOnClickListener((v) -> {
                     if (!recording) {
-                        try {
-                            recorder.start();
-                            activeSession.setRepeatingRequest(
-                                    builder.build(),
-                                    null,
-                                    new Handler());
-                            recording = true;
-                        } catch (CameraAccessException e) {
-                            Log.e(TAG, "setRepeatingRequest()", e);
-                        }
+                        recorder.start();
+                        recording = true;
                     } else {
-                        stop();
-                        showMovieAndFinish();
+                        startStop.setEnabled(false);
+                        Thread t = new Thread(() -> {
+                            stopAndReleaseResources();
+                            runOnUiThread(this::showMovie);
+                        });
+                        t.start();
                     }
                     updateStartStop();
                 }
@@ -73,6 +71,8 @@ public class KameraDemo4 extends Activity {
     @Override
     protected void onStart() {
         super.onStart();
+        startBackgroundThread();
+        recorder = null;
         if ((checkSelfPermission(Manifest.permission.CAMERA)
                 != PackageManager.PERMISSION_GRANTED) ||
                 (checkSelfPermission(Manifest.permission.RECORD_AUDIO)
@@ -81,9 +81,9 @@ public class KameraDemo4 extends Activity {
             requestPermissions(new String[]
                             {Manifest.permission.CAMERA,
                                     Manifest.permission.RECORD_AUDIO},
-                    PERMISSIONS_REQUEST_RECORD);
+                    RQ_RECORD);
         } else {
-            doIt();
+            prepare();
         }
     }
 
@@ -91,13 +91,13 @@ public class KameraDemo4 extends Activity {
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[],
                                            int[] grantResults) {
-        if ((requestCode == PERMISSIONS_REQUEST_RECORD) &&
+        if ((requestCode == RQ_RECORD) &&
                 (grantResults.length == 2
                         && grantResults[0] ==
                         PackageManager.PERMISSION_GRANTED
                         && grantResults[1] ==
                         PackageManager.PERMISSION_GRANTED)) {
-            doIt();
+            prepare();
         }
     }
 
@@ -105,10 +105,11 @@ public class KameraDemo4 extends Activity {
     protected void onPause() {
         super.onPause();
         Log.d(TAG, "onPause()");
-        stop();
+        stopAndReleaseResources();
+        stopBackgroundThread();
     }
 
-    private void doIt() throws SecurityException {
+    private void prepare() throws SecurityException {
         CameraManager manager = getSystemService(CameraManager.class);
         String cameraId = null;
         Size[] sizes = null;
@@ -135,28 +136,29 @@ public class KameraDemo4 extends Activity {
                 }
             }
         } catch (CameraAccessException e) {
-            Log.e(TAG, "doIt()", e);
+            Log.e(TAG, "prepare()", e);
         }
         if ((cameraId == null) || (sizes == null)) {
             Log.d(TAG, "keine passende Kamera gefunden");
             finish();
         } else {
-            final int width = sizes[sizes.length - 1].getWidth();
-            final int height = sizes[sizes.length - 1].getHeight();
+            Size size = sizes[sizes.length - 1];
+            final int width = size.getWidth();
+            final int height = size.getHeight();
             try {
                 // Recorder vorbereiten
                 recorder = new MediaRecorder();
-                recorder.setVideoSource(
-                        MediaRecorder.VideoSource.SURFACE);
                 recorder.setAudioSource(
                         MediaRecorder.AudioSource.CAMCORDER);
+                recorder.setVideoSource(
+                        MediaRecorder.VideoSource.SURFACE);
                 recorder.setOutputFormat(
                         MediaRecorder.OutputFormat.MPEG_4);
+                recorder.setOutputFile(getFilename());
+                recorder.setVideoSize(width, height);
                 recorder.setVideoEncoder(
                         MediaRecorder.VideoEncoder.H264);
                 recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
-                recorder.setVideoSize(width, height);
-                recorder.setOutputFile(getFilename());
                 recorder.prepare();
                 recording = false;
                 // Kamera öffnen
@@ -167,7 +169,7 @@ public class KameraDemo4 extends Activity {
                             public void onOpened(CameraDevice camera) {
                                 Log.d(TAG, "onOpened()");
                                 KameraDemo4.this.camera = camera;
-                                createCaptureSession();
+                                createCaptureSession(width, height);
                             }
 
                             @Override
@@ -183,26 +185,40 @@ public class KameraDemo4 extends Activity {
                             }
                         }, null);
             } catch (CameraAccessException | IOException e) {
-                Log.e(TAG, "doIt()", e);
+                Log.e(TAG, "prepare()", e);
             }
             updateStartStop();
         }
     }
 
-    private void createCaptureSession() {
+    private void createCaptureSession(int width, int height) {
         List<Surface> outputs = new ArrayList<>();
-        final Surface surface = recorder.getSurface();
-        outputs.add(surface);
+        final Surface recorderSurface = recorder.getSurface();
+        outputs.add(recorderSurface);
+        SurfaceView preview = findViewById(R.id.preview);
+        SurfaceHolder holder = preview.getHolder();
+        holder.setFixedSize(width, height);
+        Surface previewSurface = holder.getSurface();
+        outputs.add(previewSurface);
         try {
-            builder =
-                    camera.createCaptureRequest(
-                            CameraDevice.TEMPLATE_RECORD);
-            builder.addTarget(surface);
+            CaptureRequest.Builder builder = camera.createCaptureRequest(
+                    CameraDevice.TEMPLATE_RECORD);
+            builder.addTarget(previewSurface);
+            builder.addTarget(recorderSurface);
             camera.createCaptureSession(outputs,
                     new CameraCaptureSession.StateCallback() {
+
                         @Override
                         public void onConfigured(CameraCaptureSession session) {
                             KameraDemo4.this.activeSession = session;
+                            try {
+                                activeSession.setRepeatingRequest(
+                                        builder.build(),
+                                        null,
+                                        backgroundHandler);
+                            } catch (CameraAccessException e) {
+                                Log.e(TAG, "setRepeatingRequest()", e);
+                            }
                             startStop.setEnabled(true);
                         }
 
@@ -211,7 +227,7 @@ public class KameraDemo4 extends Activity {
                                 CameraCaptureSession session) {
                             Log.e(TAG, "onConfigureFailed()");
                         }
-                    }, null);
+                    }, backgroundHandler);
         } catch (CameraAccessException e) {
             Log.e(TAG, "createCaptureSession()", e);
         }
@@ -231,12 +247,11 @@ public class KameraDemo4 extends Activity {
 
     private void updateStartStop() {
         startStop.setText(getString(recording
-                ? R.string.end
-                : R.string.start
+                ? R.string.end : R.string.start
         ));
     }
 
-    private void stop() {
+    private void stopAndReleaseResources() {
         if (camera != null) {
             if (activeSession != null) {
                 activeSession.close();
@@ -245,18 +260,22 @@ public class KameraDemo4 extends Activity {
             camera.close();
             camera = null;
         }
-        if (recording) {
-            recorder.stop();
-            recording = false;
+        if (recorder != null) {
+            if (recording) {
+                recorder.stop();
+                recording = false;
+            }
+            recorder.release();
+            recorder = null;
         }
-        recorder.release();
     }
 
-    private void showMovieAndFinish() {
+    private void showMovie() {
         MediaScannerConnection.scanFile(this,
                 new String[]{getFilename()},
                 new String[]{"video/mpeg"},
                 (path, uri) -> runOnUiThread(() -> {
+                    Log.d(TAG, path);
                     Intent i = new Intent(Intent.ACTION_VIEW,
                             uri);
                     try {
@@ -265,10 +284,26 @@ public class KameraDemo4 extends Activity {
                         Toast.makeText(this,
                                 R.string.no_app,
                                 Toast.LENGTH_LONG).show();
-                    } finally {
-                        Log.d(TAG, path);
-                        finish();
                     }
                 }));
+    }
+
+    private void startBackgroundThread() {
+        backgroundThread = new HandlerThread("CameraBackground");
+        backgroundThread.start();
+        backgroundHandler = new Handler(backgroundThread.getLooper());
+    }
+
+    private void stopBackgroundThread() {
+        if (backgroundThread != null) {
+            backgroundThread.quitSafely();
+            try {
+                backgroundThread.join();
+                backgroundThread = null;
+                backgroundHandler = null;
+            } catch (InterruptedException e) {
+                Log.e(TAG, "stopBackgroundThread()", e);
+            }
+        }
     }
 }

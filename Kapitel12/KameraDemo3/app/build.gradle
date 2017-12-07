@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "com.thomaskuenneth.kamerademo3"
-        minSdkVersion 26
+        minSdkVersion 27
         targetSdkVersion 27
     }
 
