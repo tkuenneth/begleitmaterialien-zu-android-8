@@ -41,7 +41,7 @@ public class KontakteDemo2 extends Activity {
                             {Manifest.permission.READ_CONTACTS},
                     PERMISSIONS_REQUEST_READ_CONTACTS);
         } else {
-            doIt();
+            listContacts();
         }
     }
 
@@ -52,11 +52,11 @@ public class KontakteDemo2 extends Activity {
         if ((requestCode == PERMISSIONS_REQUEST_READ_CONTACTS) &&
                 (grantResults.length > 0 && grantResults[0] ==
                         PackageManager.PERMISSION_GRANTED)) {
-            doIt();
+            listContacts();
         }
     }
 
-    private void doIt() {
+    private void listContacts() {
         ContentResolver contentResolver = getContentResolver();
         // IDs und Namen aller sichtbaren Kontakte ermitteln
         String[] mainQueryProjection = {
