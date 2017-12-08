@@ -18,6 +18,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.Size;
 import android.view.Surface;
@@ -142,50 +143,62 @@ public class KameraDemo4 extends Activity {
             Log.d(TAG, "keine passende Kamera gefunden");
             finish();
         } else {
-            Size size = sizes[sizes.length - 1];
-            final int width = size.getWidth();
-            final int height = size.getHeight();
-            try {
-                // Recorder vorbereiten
-                recorder = new MediaRecorder();
-                recorder.setAudioSource(
-                        MediaRecorder.AudioSource.CAMCORDER);
-                recorder.setVideoSource(
-                        MediaRecorder.VideoSource.SURFACE);
-                recorder.setOutputFormat(
-                        MediaRecorder.OutputFormat.MPEG_4);
-                recorder.setOutputFile(getFilename());
-                recorder.setVideoSize(width, height);
-                recorder.setVideoEncoder(
-                        MediaRecorder.VideoEncoder.H264);
-                recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
-                recorder.prepare();
-                recording = false;
-                // Kamera öffnen
-                manager.openCamera(cameraId,
-                        new CameraDevice.StateCallback() {
+            DisplayMetrics metrics =
+                    getResources().getDisplayMetrics();
+            int _w = metrics.widthPixels;
+            int _h = metrics.heightPixels;
+            Size size = null;
+            for (Size _s : sizes) {
+                if (_s.getWidth() <= _w && _s.getHeight() <= _h) {
+                    size = _s;
+                    break;
+                }
+            }
+            if (size != null) {
+                final int width = size.getWidth();
+                final int height = size.getHeight();
+                try {
+                    // Recorder vorbereiten
+                    recorder = new MediaRecorder();
+                    recorder.setAudioSource(
+                            MediaRecorder.AudioSource.CAMCORDER);
+                    recorder.setVideoSource(
+                            MediaRecorder.VideoSource.SURFACE);
+                    recorder.setOutputFormat(
+                            MediaRecorder.OutputFormat.MPEG_4);
+                    recorder.setOutputFile(getFilename());
+                    recorder.setVideoSize(width, height);
+                    recorder.setVideoEncoder(
+                            MediaRecorder.VideoEncoder.H264);
+                    recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
+                    recorder.prepare();
+                    recording = false;
+                    // Kamera öffnen
+                    manager.openCamera(cameraId,
+                            new CameraDevice.StateCallback() {
 
-                            @Override
-                            public void onOpened(CameraDevice camera) {
-                                Log.d(TAG, "onOpened()");
-                                KameraDemo4.this.camera = camera;
-                                createCaptureSession(width, height);
-                            }
+                                @Override
+                                public void onOpened(CameraDevice camera) {
+                                    Log.d(TAG, "onOpened()");
+                                    KameraDemo4.this.camera = camera;
+                                    createCaptureSession(width, height);
+                                }
 
-                            @Override
-                            public void onDisconnected(
-                                    CameraDevice camera) {
-                                Log.d(TAG, "onDisconnected()");
-                            }
+                                @Override
+                                public void onDisconnected(
+                                        CameraDevice camera) {
+                                    Log.d(TAG, "onDisconnected()");
+                                }
 
-                            @Override
-                            public void onError(CameraDevice camera,
-                                                int error) {
-                                Log.d(TAG, "onError(): " + error);
-                            }
-                        }, null);
-            } catch (CameraAccessException | IOException e) {
-                Log.e(TAG, "prepare()", e);
+                                @Override
+                                public void onError(CameraDevice camera,
+                                                    int error) {
+                                    Log.d(TAG, "onError(): " + error);
+                                }
+                            }, null);
+                } catch (CameraAccessException | IOException e) {
+                    Log.e(TAG, "prepare()", e);
+                }
             }
             updateStartStop();
         }
