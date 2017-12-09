@@ -1,6 +1,5 @@
 package com.thomaskuenneth.accountdemo2;
 
-import android.Manifest;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.accounts.AccountManagerCallback;
@@ -8,7 +7,7 @@ import android.accounts.AccountManagerFuture;
 import android.accounts.AuthenticatorException;
 import android.accounts.OperationCanceledException;
 import android.app.Activity;
-import android.content.pm.PackageManager;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.util.Log;
@@ -22,9 +21,8 @@ import java.net.URL;
 public class AccountDemo2 extends Activity implements
         AccountManagerCallback<Bundle> {
 
-    // Konto-Typ
+    private static final int RQ_ACCOUNT_INTENT = 123;
     private static final String TYPE = "com.google";
-    // wird bei der Ermittlung des Auth Tokens benötigt
     private static final String AUTH_TOKEN_TYPE = "cl";
 
     // Schlüssel unter https://console.developers.google.com/ anlegen
@@ -34,34 +32,33 @@ public class AccountDemo2 extends Activity implements
     private static final String TAG =
             AccountDemo2.class.getSimpleName();
 
-    private static final int
-            PERMISSIONS_REQUEST_GET_ACCOUNTS = 123;
-
     @Override
-    protected void onStart() {
-        super.onStart();
-        if (checkSelfPermission(Manifest.permission.GET_ACCOUNTS)
-                != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]
-                            {Manifest.permission.GET_ACCOUNTS},
-                    PERMISSIONS_REQUEST_GET_ACCOUNTS);
-        } else {
-            doIt();
-        }
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Intent i = AccountManager.newChooseAccountIntent(null,
+                null,
+                new String[]{TYPE},
+                null,
+                AUTH_TOKEN_TYPE,
+                null,
+                null);
+        startActivityForResult(i, RQ_ACCOUNT_INTENT);
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[],
-                                           int[] grantResults) {
-        if ((requestCode == PERMISSIONS_REQUEST_GET_ACCOUNTS) &&
-                (grantResults.length > 0 && grantResults[0] ==
-                        PackageManager.PERMISSION_GRANTED)) {
-            doIt();
+    protected void onActivityResult(int requestCode,
+                                    int resultCode,
+                                    Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if ((RESULT_OK == resultCode)
+                && (RQ_ACCOUNT_INTENT == requestCode)) {
+            if (data != null) {
+                accessAccount();
+            }
         }
     }
 
-    private void doIt() {
+    private void accessAccount() {
         StrictMode.setThreadPolicy(StrictMode.ThreadPolicy.LAX);
         AccountManager accountManager = AccountManager.get(this);
         try {
@@ -78,6 +75,7 @@ public class AccountDemo2 extends Activity implements
         } catch (SecurityException e) {
             Log.e(TAG, "getAccountsByType()", e);
         }
+
     }
 
     @Override
