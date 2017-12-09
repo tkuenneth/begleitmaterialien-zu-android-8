@@ -64,7 +64,7 @@ public class AccountDemo2 extends Activity implements
         try {
             Account[] accounts =
                     accountManager.getAccountsByType(TYPE);
-            if (accounts.length == 1) {
+            if (accounts.length >= 1) {
                 Bundle options = new Bundle();
                 accountManager.getAuthToken(accounts[0],
                         AUTH_TOKEN_TYPE, options,
