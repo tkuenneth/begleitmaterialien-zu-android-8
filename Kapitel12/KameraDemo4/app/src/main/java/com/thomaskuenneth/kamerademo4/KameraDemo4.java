@@ -12,6 +12,7 @@ import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.params.StreamConfigurationMap;
+import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
 import android.media.MediaScannerConnection;
 import android.os.Bundle;
@@ -152,13 +153,9 @@ public class KameraDemo4 extends Activity {
                         MediaRecorder.AudioSource.CAMCORDER);
                 recorder.setVideoSource(
                         MediaRecorder.VideoSource.SURFACE);
-                recorder.setOutputFormat(
-                        MediaRecorder.OutputFormat.MPEG_4);
+                recorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_720P));
                 recorder.setOutputFile(getFilename());
                 recorder.setVideoSize(width, height);
-                recorder.setVideoEncoder(
-                        MediaRecorder.VideoEncoder.H264);
-                recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
                 recorder.prepare();
                 recording = false;
                 // Kamera öffnen
