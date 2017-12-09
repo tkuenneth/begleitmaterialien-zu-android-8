@@ -75,7 +75,6 @@ public class AccountDemo2 extends Activity implements
         } catch (SecurityException e) {
             Log.e(TAG, "getAccountsByType()", e);
         }
-
     }
 
     @Override
