@@ -23,7 +23,7 @@ public class KalenderDemo2 extends Activity {
                             {Manifest.permission.READ_CALENDAR},
                     PERMISSIONS_REQUEST_READ_CALENDAR);
         } else {
-            doIt();
+            logEvents();
         }
     }
 
@@ -34,13 +34,13 @@ public class KalenderDemo2 extends Activity {
         if ((requestCode == PERMISSIONS_REQUEST_READ_CALENDAR) &&
                 (grantResults.length > 0 && grantResults[0] ==
                         PackageManager.PERMISSION_GRANTED)) {
-            doIt();
+            logEvents();
         } else {
             finish();
         }
     }
 
-    private void doIt() throws SecurityException {
+    private void logEvents() throws SecurityException {
         Cursor c = getContentResolver().
                 query(Events.CONTENT_URI,
                         null, null, null, null);

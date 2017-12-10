@@ -23,7 +23,7 @@ public class AlarmClockDemo2 extends Activity {
         if (i == null) {
             tv.setText(getString(R.string.no_intent));
         } else {
-            tv.setText(String.format("%s\\n", i.getAction()));
+            tv.setText(String.format("%s\n", i.getAction()));
             Bundle b = i.getExtras();
             if (b != null) {
                 for (String s : b.keySet()) {
