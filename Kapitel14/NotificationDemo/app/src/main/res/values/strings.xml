@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">NotificationDemo</string>
     <string name="ongoing">Laufend</string>
@@ -6,4 +7,5 @@
     <string name="button">Los!</string>
     <string name="page2">Seite #2</string>
     <string name="reply">Antwort</string>
+    <string name="hint">Einen Text eingeben</string>
 </resources>

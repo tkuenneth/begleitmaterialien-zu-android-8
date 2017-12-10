@@ -10,7 +10,6 @@ import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.app.RemoteInput;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -18,9 +17,8 @@ import android.widget.EditText;
 public class NotificationDemoActivity extends Activity {
 
     private static final int NOTIFICATION_ID = 42;
-
-    // Schlüssel für den String, der im Intent übergeben wird
     private static final String EXTRA_VOICE_REPLY = "sprachantwort";
+    private static final String CHANNEL_ID = "myChannel";
 
     private EditText edittext;
     private Button button;
@@ -28,14 +26,13 @@ public class NotificationDemoActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Benutzeroberfläche laden und anzeigen
         setContentView(R.layout.main);
         // Checkboxen
-        final CheckBox local = (CheckBox) findViewById(R.id.local);
-        final CheckBox ongoing = (CheckBox) findViewById(R.id.ongoing);
-        final CheckBox page = (CheckBox) findViewById(R.id.page);
+        final CheckBox local = findViewById(R.id.local);
+        final CheckBox ongoing = findViewById(R.id.ongoing);
+        final CheckBox page = findViewById(R.id.page);
         // Eingabefeld
-        edittext = (EditText) findViewById(R.id.edittext);
+        edittext = findViewById(R.id.edittext);
         edittext.addTextChangedListener(new TextWatcher() {
 
             @Override
@@ -55,17 +52,12 @@ public class NotificationDemoActivity extends Activity {
             }
         });
         // Schaltfläche "LOS!"
-        button = (Button) findViewById(R.id.button);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                createAndSendNotification(
-                        edittext.getText().toString(),
-                        ongoing.isChecked(),
-                        local.isChecked(),
-                        page.isChecked());
-            }
-        });
+        button = findViewById(R.id.button);
+        button.setOnClickListener(v -> createAndSendNotification(
+                edittext.getText().toString(),
+                ongoing.isChecked(),
+                local.isChecked(),
+                page.isChecked()));
         // Wurde ein Intent empfangen? Dann verarbeiten
         Intent intent = getIntent();
         if (intent != null) {
@@ -88,7 +80,7 @@ public class NotificationDemoActivity extends Activity {
                 PendingIntent.FLAG_UPDATE_CURRENT);
         // Builder für die Nachricht
         NotificationCompat.Builder notificationBuilder =
-                new NotificationCompat.Builder(this)
+                new NotificationCompat.Builder(this, CHANNEL_ID)
                         .setPriority(NotificationCompat.PRIORITY_HIGH)
                         .setContentTitle(getString(R.string.app_name))
                         .setContentText(txt)
@@ -128,7 +120,7 @@ public class NotificationDemoActivity extends Activity {
                 new NotificationCompat.BigTextStyle();
         secondPageStyle.setBigContentTitle(getString(R.string.page2))
                 .bigText(sb.toString());
-        return new NotificationCompat.Builder(this)
+        return new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setStyle(secondPageStyle)
                 .build();
     }
