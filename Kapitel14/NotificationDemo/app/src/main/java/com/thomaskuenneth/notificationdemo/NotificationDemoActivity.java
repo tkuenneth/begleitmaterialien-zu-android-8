@@ -2,6 +2,8 @@ package com.thomaskuenneth.notificationdemo;
 
 import android.app.Activity;
 import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.os.Bundle;
@@ -27,11 +29,9 @@ public class NotificationDemoActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-        // Checkboxen
         final CheckBox local = findViewById(R.id.local);
         final CheckBox ongoing = findViewById(R.id.ongoing);
         final CheckBox page = findViewById(R.id.page);
-        // Eingabefeld
         edittext = findViewById(R.id.edittext);
         edittext.addTextChangedListener(new TextWatcher() {
 
@@ -51,13 +51,20 @@ public class NotificationDemoActivity extends Activity {
                 updateButton();
             }
         });
-        // Schaltfläche "LOS!"
         button = findViewById(R.id.button);
         button.setOnClickListener(v -> createAndSendNotification(
                 edittext.getText().toString(),
                 ongoing.isChecked(),
                 local.isChecked(),
                 page.isChecked()));
+        // Kanal erzeugen
+        NotificationChannel channel = new NotificationChannel(CHANNEL_ID,
+                getString(R.string.channel_name),
+                NotificationManager.IMPORTANCE_DEFAULT);
+        NotificationManager nm = getSystemService(NotificationManager.class);
+        if (nm != null) {
+            nm.createNotificationChannel(channel);
+        }
         // Wurde ein Intent empfangen? Dann verarbeiten
         Intent intent = getIntent();
         if (intent != null) {

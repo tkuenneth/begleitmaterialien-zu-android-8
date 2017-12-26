@@ -8,4 +8,5 @@
     <string name="page2">Seite #2</string>
     <string name="reply">Antwort</string>
     <string name="hint">Einen Text eingeben</string>
+    <string name="channel_name">Ein Kanal</string>
 </resources>
