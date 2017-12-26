@@ -3,7 +3,9 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/SubscriptionManagerDemo.iml" filepath="$PROJECT_DIR$/SubscriptionManagerDemo.iml" />
+      <module fileurl="file://C:\Users\tkuen\Entwicklung\Bitbucket\begleit8\Kapitel07\SubscriptionManagerDemo\SubscriptionManagerDemo.iml" filepath="C:\Users\tkuen\Entwicklung\Bitbucket\begleit8\Kapitel07\SubscriptionManagerDemo\SubscriptionManagerDemo.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://C:\Users\tkuen\Entwicklung\Bitbucket\begleit8\Kapitel07\SubscriptionManagerDemo\app\app.iml" filepath="C:\Users\tkuen\Entwicklung\Bitbucket\begleit8\Kapitel07\SubscriptionManagerDemo\app\app.iml" />
     </modules>
   </component>
 </project>

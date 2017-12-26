@@ -69,12 +69,15 @@ public class SubscriptionManagerDemoActivity extends Activity {
         super.onPause();
         if (m != null) {
             m.removeOnSubscriptionsChangedListener(l);
+            m = null;
         }
     }
 
     private void output() {
-        m = SubscriptionManager.from(this);
-        m.addOnSubscriptionsChangedListener(l);
+        if (m == null) {
+            m = SubscriptionManager.from(this);
+            m.addOnSubscriptionsChangedListener(l);
+        }
         List<SubscriptionInfo> l = m.getActiveSubscriptionInfoList();
         layout.removeAllViews();
         if (l != null) {

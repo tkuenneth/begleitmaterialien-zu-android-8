@@ -16,12 +16,13 @@ public class DruckDemo1Activity extends Activity {
     private static final String TAG =
             DruckDemo1Activity.class.getSimpleName();
 
+    private WebView webView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         // WebView für den Druck instantiieren
-        final WebView webView = new WebView(this);
+        webView = new WebView(this);
         webView.setWebViewClient(new WebViewClient() {
 
             @Override
@@ -41,7 +42,8 @@ public class DruckDemo1Activity extends Activity {
                             webView.createPrintDocumentAdapter("Dokumentname");
                     // Druckauftrag erstellen und übergeben
                     String jobName = getString(R.string.app_name) + " Dokument";
-                    PrintAttributes attributes = new PrintAttributes.Builder().build();
+                    PrintAttributes attributes
+                            = new PrintAttributes.Builder().build();
                     if (printAdapter != null) {
                         PrintJob printJob = printManager.print(jobName,
                                 printAdapter,

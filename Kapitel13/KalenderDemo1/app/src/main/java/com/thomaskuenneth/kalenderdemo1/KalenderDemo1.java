@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.CalendarContract;
 import android.provider.CalendarContract.Events;
 import android.util.Log;
 
@@ -36,8 +37,8 @@ public class KalenderDemo1 extends Activity {
                 Events.CONTENT_URI);
         intent.putExtra(Events.TITLE, title);
         intent.putExtra(Events.DESCRIPTION, description);
-        intent.putExtra(Events.DTSTART, from.getTime());
-        intent.putExtra(Events.DTEND, to.getTime());
+        intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, from.getTime());
+        intent.putExtra(CalendarContract.EXTRA_EVENT_END_TIME, to.getTime());
         intent.putExtra(Events.ALL_DAY, allDay);
         try {
             startActivity(intent);
