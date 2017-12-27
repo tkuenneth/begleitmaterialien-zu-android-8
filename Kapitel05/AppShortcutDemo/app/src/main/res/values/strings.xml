@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AppShortcutDemo</string>
+    <string name="static_shortcut">statisch</string>
+    <string name="dynamic_shortcut">dynamisch</string>
+    <string name="txt_static">statisch</string>
+</resources>
