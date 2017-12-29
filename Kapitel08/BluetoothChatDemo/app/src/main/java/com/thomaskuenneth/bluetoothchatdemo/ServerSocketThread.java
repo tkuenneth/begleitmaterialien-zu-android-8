@@ -8,30 +8,23 @@ import android.util.Log;
 import java.io.IOException;
 import java.util.UUID;
 
-class ServerThread extends MyThread {
+class ServerSocketThread extends SocketThread {
 
-    private static final String TAG = ServerThread.class.getSimpleName();
+    private static final String TAG = ServerSocketThread.class.getSimpleName();
 
-    private final BluetoothServerSocket serverSocket;
-
+    private BluetoothServerSocket serverSocket;
     private BluetoothSocket socket;
 
-    ServerThread(BluetoothAdapter adapter, String name, UUID uuid) {
-        BluetoothServerSocket tmp = null;
+    ServerSocketThread(BluetoothAdapter adapter, String name, UUID uuid) {
+        socket = null;
         try {
-            tmp = adapter.listenUsingRfcommWithServiceRecord(name, uuid);
+            serverSocket = adapter.listenUsingRfcommWithServiceRecord(name, uuid);
         } catch (IOException e) {
             Log.e(TAG, "listenUsingRfcommWithServiceRecord() failed", e);
         }
-        serverSocket = tmp;
-    }
-
-    public BluetoothSocket getSocket() {
-        return socket;
     }
 
     public void run() {
-        socket = null;
         while (true) {
             try {
                 socket = serverSocket.accept();
@@ -44,5 +37,9 @@ class ServerThread extends MyThread {
                 break;
             }
         }
+    }
+
+    public BluetoothSocket getSocket() {
+        return socket;
     }
 }

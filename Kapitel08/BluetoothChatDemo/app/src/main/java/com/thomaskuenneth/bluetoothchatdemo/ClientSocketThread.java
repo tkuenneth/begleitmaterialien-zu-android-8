@@ -7,20 +7,19 @@ import android.util.Log;
 import java.io.IOException;
 import java.util.UUID;
 
-class ConnectThread extends MyThread {
+class ClientSocketThread extends SocketThread {
 
-    private static final String TAG = ConnectThread.class.getSimpleName();
+    private static final String TAG = ClientSocketThread.class.getSimpleName();
 
-    private final BluetoothSocket socket;
+    private BluetoothSocket socket;
 
-    ConnectThread(BluetoothDevice device, UUID uuid) {
-        BluetoothSocket tmp = null;
+    ClientSocketThread(BluetoothDevice device, UUID uuid) {
         try {
-            tmp = device.createRfcommSocketToServiceRecord(uuid);
+            socket = device.createRfcommSocketToServiceRecord(uuid);
         } catch (IOException e) {
             Log.e(TAG, "createRfcommSocketToServiceRecord() failed", e);
+            socket = null;
         }
-        socket = tmp;
     }
 
     public void run() {
