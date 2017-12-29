@@ -26,7 +26,7 @@ public class MainActivity extends Activity {
             = 321;
     private static final String GERAET_1 = "Pixel 2";
     private static final String GERAET_2 = "Nexus 5X";
-    private static final UUID MY_UUID = UUID.fromString("38400000-8cf0-11bd-b23e-10b96e4ef00d");
+    private static final UUID MY_UUID = UUID.fromString("dc4f9aa6-ce43-4709-bd2e-7845a3e705f1");
 
     private EditText input;
     private TextView output;
