@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">BluetoothScannerDemo</string>
+    <string name="enable_bluetooth">Bitte Bluetooth aktivieren</string>
+    <string name="hint">Bitte Text eingeben</string>
+</resources>
