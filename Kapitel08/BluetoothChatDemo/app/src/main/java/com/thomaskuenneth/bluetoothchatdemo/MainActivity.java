@@ -31,8 +31,8 @@ public class MainActivity extends Activity {
     private EditText input;
     private TextView output;
     private BluetoothAdapter adapter;
-    private ServerSocketThread serverThread;
-    private ClientSocketThread clientThread;
+    private Thread serverThread;
+    private Thread clientThread;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,14 +114,14 @@ public class MainActivity extends Activity {
             }
         }
         if (remoteDevice != null) {
-            serverThread = new ServerSocketThread(adapter, TAG, MY_UUID);
+            SocketThread serverSocketThread = new ServerSocketThread(adapter, TAG, MY_UUID);
+            serverSocketThread.start();
+            serverThread = createThread(serverSocketThread);
             serverThread.start();
-            Thread t1 = createThread(serverThread);
-            t1.start();
-            clientThread = new ClientSocketThread(remoteDevice, MY_UUID);
+            SocketThread clientSocketThread = new ClientSocketThread(remoteDevice, MY_UUID);
+            clientSocketThread.start();
+            clientThread = createThread(clientSocketThread);
             clientThread.start();
-            Thread t2 = createThread(clientThread);
-            t2.start();
             input.setEnabled(true);
         }
     }
@@ -132,14 +132,16 @@ public class MainActivity extends Activity {
                 t.join();
                 BluetoothSocket socket = t.getSocket();
                 if (socket != null) {
+                    OutputStream _os = null;
+                    try {
+                        _os = socket.getOutputStream();
+                    } catch (IOException e) {
+                        Log.e(TAG, null, e);
+                    }
+                    final OutputStream os = _os;
                     input.setOnEditorActionListener((view, actionId, event) -> {
-                        try {
-                            OutputStream os = socket.getOutputStream();
-                            send(os, input.getText().toString() + "\n");
-                            runOnUiThread(() -> input.setText(""));
-                        } catch (IOException e) {
-                            Log.e(TAG, null, e);
-                        }
+                        send(os, input.getText().toString() + "\n");
+                        runOnUiThread(() -> input.setText(""));
                         return true;
                     });
                     InputStream is = socket.getInputStream();
@@ -149,6 +151,8 @@ public class MainActivity extends Activity {
                             runOnUiThread(() -> output.append(txt));
                         }
                     }
+                    input.setOnEditorActionListener(null);
+                    socket.close();
                 }
             } catch (InterruptedException | IOException e) {
                 Log.e(TAG, null, e);
