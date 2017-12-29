@@ -15,6 +15,7 @@ class ClientSocketThread extends SocketThread {
 
     ClientSocketThread(BluetoothDevice device, UUID uuid) {
         socket = null;
+        setName(TAG);
         try {
             socket = device.createRfcommSocketToServiceRecord(uuid);
         } catch (IOException e) {

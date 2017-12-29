@@ -17,8 +17,10 @@ class ServerSocketThread extends SocketThread {
 
     ServerSocketThread(BluetoothAdapter adapter, String name, UUID uuid) {
         socket = null;
+        setName(TAG);
         try {
-            serverSocket = adapter.listenUsingRfcommWithServiceRecord(name, uuid);
+            serverSocket = adapter.listenUsingRfcommWithServiceRecord(name,
+                    uuid);
         } catch (IOException e) {
             Log.e(TAG, "listenUsingRfcommWithServiceRecord() failed", e);
         }
@@ -31,7 +33,7 @@ class ServerSocketThread extends SocketThread {
             try {
                 socket = serverSocket.accept();
                 if (socket != null) {
-                    serverSocket.close();
+                    closeServerSocket();
                     keepRunning = false;
                 }
             } catch (IOException e) {
@@ -48,11 +50,26 @@ class ServerSocketThread extends SocketThread {
 
     @Override
     public void cancel() {
+        closeServerSocket();
+        if (socket != null) {
+            try {
+                socket.close();
+            } catch (IOException e) {
+                Log.e(TAG, "close() failed", e);
+            } finally {
+                socket = null;
+            }
+        }
+    }
+
+    private void closeServerSocket() {
         if (serverSocket != null) {
             try {
                 serverSocket.close();
             } catch (IOException e) {
                 Log.e(TAG, "close() failed", e);
+            } finally {
+                serverSocket = null;
             }
         }
     }

@@ -26,7 +26,8 @@ public class MainActivity extends Activity {
             = 321;
     private static final String GERAET_1 = "Pixel 2";
     private static final String GERAET_2 = "Nexus 5X";
-    private static final UUID MY_UUID = UUID.fromString("dc4f9aa6-ce43-4709-bd2e-7845a3e705f1");
+    private static final UUID MY_UUID
+            = UUID.fromString("dc4f9aa6-ce43-4709-bd2e-7845a3e705f1");
 
     private EditText input;
     private TextView output;
@@ -114,9 +115,11 @@ public class MainActivity extends Activity {
             }
         }
         if (remoteDevice != null) {
-            SocketThread serverSocketThread = new ServerSocketThread(adapter, TAG, MY_UUID);
+            SocketThread serverSocketThread
+                    = new ServerSocketThread(adapter, TAG, MY_UUID);
             serverThread = createAndStartThread(serverSocketThread);
-            SocketThread clientSocketThread = new ClientSocketThread(remoteDevice, MY_UUID);
+            SocketThread clientSocketThread
+                    = new ClientSocketThread(remoteDevice, MY_UUID);
             clientThread = createAndStartThread(clientSocketThread);
             input.setEnabled(true);
         }
@@ -130,9 +133,12 @@ public class MainActivity extends Activity {
             public void run() {
                 try {
                     t.start();
+                    Log.d(TAG, "joining " + t.getName());
                     t.join();
                     BluetoothSocket socket = t.getSocket();
                     if (socket != null) {
+                        Log.d(TAG, String.format("connection type %d for %s",
+                                socket.getConnectionType(), t.getName()));
                         OutputStream _os = null;
                         try {
                             _os = socket.getOutputStream();
@@ -152,12 +158,12 @@ public class MainActivity extends Activity {
                                 runOnUiThread(() -> output.append(txt));
                             }
                         }
-                        socket.close();
                     }
                 } catch (InterruptedException | IOException e) {
                     Log.e(TAG, null, e);
                     keepRunning = false;
                 } finally {
+                    Log.d(TAG, "calling cancel() of " + t.getName());
                     t.cancel();
                 }
             }
