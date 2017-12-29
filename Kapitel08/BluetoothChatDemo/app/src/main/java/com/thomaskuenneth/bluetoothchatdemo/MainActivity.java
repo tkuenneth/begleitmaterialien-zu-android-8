@@ -115,49 +115,55 @@ public class MainActivity extends Activity {
         }
         if (remoteDevice != null) {
             SocketThread serverSocketThread = new ServerSocketThread(adapter, TAG, MY_UUID);
-            serverSocketThread.start();
-            serverThread = createThread(serverSocketThread);
-            serverThread.start();
+            serverThread = createAndStartThread(serverSocketThread);
             SocketThread clientSocketThread = new ClientSocketThread(remoteDevice, MY_UUID);
-            clientSocketThread.start();
-            clientThread = createThread(clientSocketThread);
-            clientThread.start();
+            clientThread = createAndStartThread(clientSocketThread);
             input.setEnabled(true);
         }
     }
 
-    private Thread createThread(SocketThread t) {
-        return new Thread(() -> {
-            try {
-                t.join();
-                BluetoothSocket socket = t.getSocket();
-                if (socket != null) {
-                    OutputStream _os = null;
-                    try {
-                        _os = socket.getOutputStream();
-                    } catch (IOException e) {
-                        Log.e(TAG, null, e);
-                    }
-                    final OutputStream os = _os;
-                    input.setOnEditorActionListener((view, actionId, event) -> {
-                        send(os, input.getText().toString() + "\n");
-                        runOnUiThread(() -> input.setText(""));
-                        return true;
-                    });
-                    InputStream is = socket.getInputStream();
-                    while (!Thread.currentThread().isInterrupted()) {
-                        String txt = receive(is);
-                        if (txt != null) {
-                            runOnUiThread(() -> output.append(txt));
+    private Thread createAndStartThread(SocketThread t) {
+        Thread workerThread = new Thread() {
+            boolean keepRunning = true;
+
+            @Override
+            public void run() {
+                try {
+                    t.start();
+                    t.join();
+                    BluetoothSocket socket = t.getSocket();
+                    if (socket != null) {
+                        OutputStream _os = null;
+                        try {
+                            _os = socket.getOutputStream();
+                        } catch (IOException e) {
+                            Log.e(TAG, null, e);
                         }
+                        final OutputStream os = _os;
+                        input.setOnEditorActionListener((view, actionId, event) -> {
+                            send(os, input.getText().toString() + "\n");
+                            runOnUiThread(() -> input.setText(""));
+                            return true;
+                        });
+                        InputStream is = socket.getInputStream();
+                        while (keepRunning) {
+                            String txt = receive(is);
+                            if (txt != null) {
+                                runOnUiThread(() -> output.append(txt));
+                            }
+                        }
+                        socket.close();
                     }
-                    input.setOnEditorActionListener(null);
-                    socket.close();
+                } catch (InterruptedException | IOException e) {
+                    Log.e(TAG, null, e);
+                    keepRunning = false;
+                } finally {
+                    t.cancel();
                 }
-            } catch (InterruptedException | IOException e) {
-                Log.e(TAG, null, e);
             }
-        });
+        };
+        workerThread.start();
+        return workerThread;
     }
 
     private void send(OutputStream os, String text) {

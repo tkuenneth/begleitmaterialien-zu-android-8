@@ -14,27 +14,38 @@ class ClientSocketThread extends SocketThread {
     private BluetoothSocket socket;
 
     ClientSocketThread(BluetoothDevice device, UUID uuid) {
+        socket = null;
         try {
             socket = device.createRfcommSocketToServiceRecord(uuid);
         } catch (IOException e) {
             Log.e(TAG, "createRfcommSocketToServiceRecord() failed", e);
-            socket = null;
         }
     }
 
+    @Override
     public void run() {
         try {
             socket.connect();
         } catch (IOException connectException) {
-            try {
-                socket.close();
-            } catch (IOException closeException) {
-                Log.e(TAG, "Could not close client socket", closeException);
-            }
+            cancel();
         }
     }
 
+    @Override
     public BluetoothSocket getSocket() {
         return socket;
+    }
+
+    @Override
+    public void cancel() {
+        if (socket != null) {
+            try {
+                socket.close();
+            } catch (IOException e) {
+                Log.e(TAG, "Could not close client socket", e);
+            } finally {
+                socket = null;
+            }
+        }
     }
 }

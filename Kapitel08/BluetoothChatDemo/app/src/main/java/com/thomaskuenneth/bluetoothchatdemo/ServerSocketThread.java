@@ -24,22 +24,36 @@ class ServerSocketThread extends SocketThread {
         }
     }
 
+    @Override
     public void run() {
-        while (true) {
+        boolean keepRunning = true;
+        while (keepRunning) {
             try {
                 socket = serverSocket.accept();
                 if (socket != null) {
                     serverSocket.close();
-                    break;
+                    keepRunning = false;
                 }
             } catch (IOException e) {
                 Log.e(TAG, "accept() failed", e);
-                break;
+                keepRunning = false;
             }
         }
     }
 
+    @Override
     public BluetoothSocket getSocket() {
         return socket;
+    }
+
+    @Override
+    public void cancel() {
+        if (serverSocket != null) {
+            try {
+                serverSocket.close();
+            } catch (IOException e) {
+                Log.e(TAG, "close() failed", e);
+            }
+        }
     }
 }
