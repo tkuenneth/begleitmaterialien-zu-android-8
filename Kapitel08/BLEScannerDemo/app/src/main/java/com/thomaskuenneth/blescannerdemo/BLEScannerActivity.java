@@ -3,6 +3,10 @@ package com.thomaskuenneth.blescannerdemo;
 import android.Manifest;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothGatt;
+import android.bluetooth.BluetoothGattCallback;
+import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanCallback;
@@ -10,6 +14,7 @@ import android.bluetooth.le.ScanResult;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -21,6 +26,8 @@ import java.util.Map;
 
 public class BLEScannerActivity extends Activity {
 
+    private static final String TAG
+            = BLEScannerActivity.class.getSimpleName();
     private static final int REQUEST_ACCESS_COARSE_LOCATION
             = 321;
 
@@ -42,6 +49,26 @@ public class BLEScannerActivity extends Activity {
             for (ScanResult result : results) {
                 updateData(result);
             }
+        }
+    };
+
+    private final BluetoothGattCallback gattCallback
+            = new BluetoothGattCallback() {
+
+        @Override
+        public void onServicesDiscovered(BluetoothGatt gatt, int status) {
+            if (status == BluetoothGatt.GATT_SUCCESS) {
+                logGattServices(gatt);
+            } else {
+                Log.d(TAG, "onServicesDiscovered: " + status);
+            }
+            gatt.close();
+        }
+
+        @Override
+        public void onConnectionStateChange(BluetoothGatt gatt,
+                                            int status, int newState) {
+            Log.d(TAG, "Status der Verbindung: " + newState);
         }
     };
 
@@ -150,5 +177,17 @@ public class BLEScannerActivity extends Activity {
 
     private void info(ScanResult result) {
         tv.setText(result.toString());
+        BluetoothDevice device = result.getDevice();
+        BluetoothGatt gatt = device.connectGatt(this,
+                true, gattCallback);
+        boolean started = gatt.discoverServices();
+        Log.d(TAG, "discoverServices(): " + started);
+    }
+
+    private void logGattServices(BluetoothGatt gatt) {
+        List<BluetoothGattService> services = gatt.getServices();
+        for (BluetoothGattService service : services) {
+            Log.d(TAG, "Service " + service.getUuid().toString());
+        }
     }
 }
