@@ -1,19 +1,11 @@
-## Welcome ##
+## Welcome / Willkommen ##
 
 This repo contains all samples accompanying the German book
 
-Android 7 - Apps entwickeln mit Android Studio  
-by Thomas Künneth  
-ISBN 978-3-8362-4200-4
-
-https://www.rheinwerk-verlag.de/android-7_4156/
-
-## Willkommen ###
-
 Dieses Repository enthält die Begleitmaterialien zu dem Buch
 
-Android 7 - Apps entwickeln mit Android Studio  
-von Thomas Künneth  
-ISBN 978-3-8362-4200-4
+Android 7 - Das Praxisbuch für Entwickler
+Thomas Künneth
+ISBN 978-3-8362-6058-9
 
-https://www.rheinwerk-verlag.de/android-7_4156/
+https://www.rheinwerk-verlag.de/android-8_4564/
