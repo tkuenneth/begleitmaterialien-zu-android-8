@@ -30,14 +30,14 @@ public class AudioEffekteDemo extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-        // MediaPlayer instantiieren
+        // MediaPlayer instanziieren
         mediaPlayer = MediaPlayer.create(this, R.raw.guten_tag);
         mediaPlayer.setOnCompletionListener((mp) -> {
             playing = false;
             updateButtonText();
         });
         int sessionId = mediaPlayer.getAudioSessionId();
-        // BassBoost instantiieren und an Audio Session binden
+        // BassBoost instanziieren und an Audio Session binden
         bassBoost = new BassBoost(0, sessionId);
         Log.d(TAG, "getRoundedStrength(): "
                 + bassBoost.getRoundedStrength());
@@ -57,7 +57,7 @@ public class AudioEffekteDemo extends Activity {
             }
         });
         cbBassBoost.setChecked(false);
-        // Virtualizer instantiieren und an Audio Session binden
+        // Virtualizer instanziieren und an Audio Session binden
         virtualizer = new Virtualizer(0, sessionId);
         virtualizer.setStrength((short) 1000);
         // Checkbox schaltet Virtualizer aus und ein

@@ -66,7 +66,7 @@ class DemoPrintDocumentAdapter extends PrintDocumentAdapter {
                         ParcelFileDescriptor destination,
                         CancellationSignal cancellationSignal,
                         WriteResultCallback callback) {
-        // über ale Seiten des Dokuments iterieren
+        // über alle Seiten des Dokuments iterieren
         for (int i = 0; i < numPages; i++) {
             // Abbruch?
             if (cancellationSignal.isCanceled()) {

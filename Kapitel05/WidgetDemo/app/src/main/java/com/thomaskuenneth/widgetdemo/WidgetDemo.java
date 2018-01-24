@@ -31,7 +31,7 @@ public class WidgetDemo extends Activity {
             // eingegebenen Text auslesen
             String name = e.getText().toString();
             try {
-                // ein Objekt instantiieren
+                // ein Objekt instanziieren
                 Class<?> c = Class.forName(name);
                 Object o = c.getDeclaredConstructor(Context.class)
                         .newInstance(WidgetDemo.this);
@@ -45,7 +45,7 @@ public class WidgetDemo extends Activity {
             } catch (Throwable tr) {
                 String str = getString(R.string.error, name);
                 Toast.makeText(WidgetDemo.this, str, Toast.LENGTH_LONG).show();
-                Log.e(TAG, "Fehler beim Instantiieren von " + name, tr);
+                Log.e(TAG, "Fehler beim Instanziieren von " + name, tr);
             }
         });
         // auf "Go" reagieren

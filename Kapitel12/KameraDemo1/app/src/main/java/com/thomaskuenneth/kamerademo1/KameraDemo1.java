@@ -15,7 +15,7 @@ public class KameraDemo1 extends Activity {
         setContentView(R.layout.main);
         Button foto = findViewById(R.id.foto);
         foto.setOnClickListener((v) -> {
-            // Intent instantiieren
+            // Intent instanziieren
             Intent intent = new Intent(
                     MediaStore.INTENT_ACTION_STILL_IMAGE_CAMERA);
             // Activity starten

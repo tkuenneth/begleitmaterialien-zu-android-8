@@ -27,7 +27,7 @@ public class AudioManagerDemoActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        // Intent Filter konfigurieren
+        // Intent-Filter konfigurieren
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(AudioManager.ACTION_HEADSET_PLUG);
         intentFilter.addAction(AudioManager.ACTION_AUDIO_BECOMING_NOISY);

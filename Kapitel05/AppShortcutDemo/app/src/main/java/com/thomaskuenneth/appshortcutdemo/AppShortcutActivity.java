@@ -28,7 +28,7 @@ public class AppShortcutActivity extends Activity {
             Toast.makeText(this, s,
                     Toast.LENGTH_LONG).show();
         }
-        // dynamisches Shortcut
+        // dynamischer Shortcut
         Intent intent = new Intent(this, AppShortcutActivity.class);
         intent.setAction(ACTION);
         intent.setData(Uri.parse("https://www.rheinwerk-verlag.de/"));

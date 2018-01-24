@@ -8,7 +8,7 @@ import java.lang.ref.WeakReference;
 
 class MyTask extends AsyncTask<String, Void, String> {
 
-    // vermeidet this fields leaks a context...
+    // vermeidet this field leaks a context object
     private final WeakReference<TextView> r;
 
     MyTask(TextView a) {

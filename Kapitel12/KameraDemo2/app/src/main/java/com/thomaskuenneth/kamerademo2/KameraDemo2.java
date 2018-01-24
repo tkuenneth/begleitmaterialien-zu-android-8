@@ -30,7 +30,7 @@ public class KameraDemo2 extends Activity {
     private ImageView imageView;
     private Button button;
 
-    // über diese Uri ist die Aufnahme erreichbar
+    // über diesen URI ist die Aufnahme erreichbar
     private Uri imageUri;
 
     @Override

@@ -31,7 +31,7 @@ public class AuswahlFragment extends ListFragment {
                     savedInstanceState.getInt(STR_ZULETZT_SELEKTIERT, 0);
         }
         if (zweiSpaltenModus) {
-            // Im Zweispalten-Modus invertiert die View das
+            // Im Zweispaltenmodus invertiert die View das
             // selektierte Element
             getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
             // Details anzeigen
@@ -55,7 +55,7 @@ public class AuswahlFragment extends ListFragment {
     void detailsAnzeigen(int index) {
         zuletztSelektiert = index;
         if (zweiSpaltenModus) {
-            // "in place"-Darstellung
+            // In-place-Darstellung
             getListView().setItemChecked(index, true);
             DetailsFragment details = (DetailsFragment)
                     getFragmentManager()

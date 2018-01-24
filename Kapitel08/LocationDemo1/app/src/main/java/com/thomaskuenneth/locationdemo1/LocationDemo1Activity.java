@@ -94,7 +94,7 @@ public class LocationDemo1Activity extends Activity {
                     lp.requiresSatellite() + "\n\n");
         }
         // Provider mit grober Auflösung
-        // und niedrigen Energieverbrauch
+        // und niedrigem Energieverbrauch
         Criteria criteria = new Criteria();
         criteria.setAccuracy(Criteria.ACCURACY_COARSE);
         criteria.setPowerRequirement(Criteria.POWER_LOW);

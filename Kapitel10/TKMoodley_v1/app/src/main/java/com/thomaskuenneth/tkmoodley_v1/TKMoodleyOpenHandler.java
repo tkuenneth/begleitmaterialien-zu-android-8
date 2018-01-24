@@ -15,7 +15,7 @@ class TKMoodleyOpenHandler extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "tkmoodley.db";
     private static final int DATABASE_VERSION = 1;
 
-    // Name und Attribute der abelle "mood"
+    // Name und Attribute der Tabelle "mood"
     private static final String _ID = "_id";
     private static final String TABLE_NAME_MOOD = "mood";
     private static final String MOOD_TIME = "timeMillis";
@@ -26,12 +26,12 @@ class TKMoodleyOpenHandler extends SQLiteOpenHelper {
     static final int MOOD_OK = 2;
     static final int MOOD_BAD = 3;
 
-    // abelle mood anlegen
+    // Tabelle mood anlegen
     private static final String TABLE_MOOD_CREATE = "CREATE TABLE "
             + TABLE_NAME_MOOD + " (" + _ID
             + " INTEGER PRIMARY KEY AUTOINCREMENT, " + MOOD_TIME
             + " INTEGER, " + MOOD_MOOD + " INTEGER);";
-    // abelle mood löschen
+    // Tabelle mood löschen
     private static final String TABLE_MOOD_DROP =
             "DROP TABLE IF EXISTS " + TABLE_NAME_MOOD;
 
@@ -64,7 +64,7 @@ class TKMoodleyOpenHandler extends SQLiteOpenHelper {
             ContentValues values = new ContentValues();
             values.put(MOOD_MOOD, mood);
             values.put(MOOD_TIME, timeMillis);
-            // in die abelle mood einfügen
+            // in die Tabelle mood einfügen
             rowId = db.insert(TABLE_NAME_MOOD, null, values);
         } catch (SQLiteException e) {
             Log.e(TAG, "insert()", e);

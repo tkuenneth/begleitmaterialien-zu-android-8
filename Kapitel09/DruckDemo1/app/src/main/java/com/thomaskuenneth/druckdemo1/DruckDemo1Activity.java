@@ -21,7 +21,7 @@ public class DruckDemo1Activity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // WebView für den Druck instantiieren
+        // WebView für den Druck instanziieren
         webView = new WebView(this);
         webView.setWebViewClient(new WebViewClient() {
 

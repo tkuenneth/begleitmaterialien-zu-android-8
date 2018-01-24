@@ -35,7 +35,7 @@ public class DemoSender extends Activity {
                 (Intent.ACTION_SEND.equals(intent.getAction()))) {
             setContentView(R.layout.demosender);
             ImageView imageView = findViewById(R.id.image);
-            // Uri des erhaltenen Bildes
+            // URI des erhaltenen Bildes
             Bundle b = intent.getExtras();
             if (b != null) {
                 Uri imageUri = (Uri) b.get(
