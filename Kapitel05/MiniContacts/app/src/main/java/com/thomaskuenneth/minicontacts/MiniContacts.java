@@ -59,7 +59,7 @@ public class MiniContacts extends ListActivity
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         return new CursorLoader(this,
-                ContactsContract.Data.CONTENT_URI,
+                ContactsContract.Contacts.CONTENT_URI,
                 PROJECTION, SELECTION, null, null);
     }
 
